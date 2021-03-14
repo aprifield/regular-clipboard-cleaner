@@ -1,57 +1,56 @@
 <template>
   <v-app>
-    <v-app-bar app color="primary" dark>
-      <div class="d-flex align-center">
-        <v-img
-          alt="Vuetify Logo"
-          class="shrink mr-2"
-          contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
-          transition="scale-transition"
-          width="40"
-        />
-
-        <v-img
-          alt="Vuetify Name"
-          class="shrink mt-1 hidden-sm-and-down"
-          contain
-          min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
-          width="100"
-        />
-      </div>
-
-      <v-spacer></v-spacer>
-
-      <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-        text
-      >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>mdi-open-in-new</v-icon>
-      </v-btn>
-    </v-app-bar>
-
     <v-main>
-      <HelloWorld />
+      <ClipboardHistory
+        :historyItems="historyItems"
+        @clipboard-trash-click="onClipboardTrashClick"
+      />
     </v-main>
   </v-app>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import HelloWorld from './components/HelloWorld.vue';
+import { HistoryItem } from '@/types/history-item';
+import ClipboardHistory from '@/components/ClipboardHistory.vue';
 
 export default Vue.extend({
   name: 'App',
 
-  components: {
-    HelloWorld
+  components: { ClipboardHistory },
+
+  data(): { historyItems: HistoryItem[] } {
+    return { historyItems: [] };
   },
 
-  data: () => ({
-    //
-  })
+  computed: {
+    ipcBridge() {
+      const ipcBridge = ((window as unknown) as {
+        ipcBridge: {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          send(channel: string, data?: any): void;
+          on(
+            channel: string,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            listener: (event: any, ...args: any[]) => void
+          ): void;
+        };
+      }).ipcBridge;
+      return ipcBridge;
+    }
+  },
+
+  methods: {
+    onClipboardTrashClick(text: string) {
+      this.ipcBridge.send('app-clipboard-trash-clicked', text);
+    }
+  },
+
+  created() {
+    this.ipcBridge.send('app-created');
+    this.ipcBridge.on('init-history', (event, args) => {
+      this.historyItems = args;
+    });
+  }
 });
 </script>
