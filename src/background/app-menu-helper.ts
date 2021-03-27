@@ -89,7 +89,7 @@ app.whenReady().then(() => {
           label: 'Learn More',
           click: async () => {
             await shell.openExternal(
-              'https://github.com/aprifield/clipboard-cleaner'
+              'https://github.com/aprifield/regular-clipboard-cleaner'
             );
           }
         }

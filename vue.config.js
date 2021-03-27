@@ -2,8 +2,8 @@ module.exports = {
   pluginOptions: {
     electronBuilder: {
       builderOptions: {
-        appId: 'com.aprifield.clipboard-cleaner',
-        productName: 'Clipboard Cleaner'
+        appId: 'com.aprifield.regular-clipboard-cleaner',
+        productName: 'Regular Clipboard Cleaner'
       },
       preload: 'src/preload.ts'
     }

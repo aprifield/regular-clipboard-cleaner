@@ -1,24 +1,31 @@
-# clipboard-cleaner
+# Regular Clipboard Cleaner
+
+Regular Clipboard Cleaner is an application that clears the clipboard regularly, built with Electron, Vue, and Vuetify.
 
 ## Project setup
+
 ```
 npm install
 ```
 
-### Compiles and hot-reloads for development
+### Start a development server
+
 ```
-npm run serve
+npm run electron:serve
 ```
 
-### Compiles and minifies for production
+### Build an application
+
 ```
-npm run build
+npm run electron:build
 ```
 
 ### Lints and fixes files
+
 ```
 npm run lint
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## License
+
+MIT
