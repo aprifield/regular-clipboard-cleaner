@@ -1,17 +1,32 @@
 'use strict';
 
-import { app, protocol, BrowserWindow, ipcMain, Menu } from 'electron';
+import {
+  app,
+  protocol,
+  BrowserWindow,
+  ipcMain,
+  nativeTheme,
+  clipboard
+} from 'electron';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
 import path from 'path';
 import {
   getHistoryItems,
-  setHistoryItems
+  getSettings,
+  setSettings
 } from '@/background/electron-store-helper';
 import '@/background/app-tray-helper';
+import '@/background/app-menu-helper';
 import { registerShortcut } from '@/background/global-shortcut-helper';
 import '@/background/clipboard-cleaner';
-import { restart } from '@/background/clipboard-cleaner';
+import {
+  deleteAllHistory,
+  deleteHistory,
+  restartMonitoring
+} from '@/background/clipboard-cleaner';
+import { Settings } from '@/types/settings';
+import { setOpenAtLogin } from './background/app-login-helper';
 const isDevelopment = process.env.NODE_ENV !== 'production';
 const gotTheLock = app.requestSingleInstanceLock();
 
@@ -21,18 +36,29 @@ if (!gotTheLock) {
 
 app.setName('Clipboard Cleaner');
 
-let win: BrowserWindow | null;
+let historyWin: BrowserWindow | null;
+let settingsWin: BrowserWindow | null;
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true } }
 ]);
 
-async function createWindow() {
+async function createWindow(mode: 'history' | 'settings') {
+  const settings = {
+    position: [undefined, undefined],
+    size: [800, 600],
+    ...(mode === 'settings'
+      ? getSettings().settingsWin || {}
+      : getSettings().historyWin || {})
+  };
+
   // Create the browser window.
-  win = new BrowserWindow({
-    width: 800,
-    height: 600,
+  const win = new BrowserWindow({
+    width: settings.size[0],
+    height: settings.size[1],
+    x: settings.position[0],
+    y: settings.position[1],
     webPreferences: {
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
@@ -42,36 +68,47 @@ async function createWindow() {
       contextIsolation: true,
       preload: path.join(__dirname, 'preload.js')
     },
-    skipTaskbar: true,
-    icon: path.join(__static, 'icon.png'),
-    title: 'Clipboard Cleaner'
+    icon: path.join(__static, 'icon.png')
   });
+  if (settings.maximized) {
+    win.maximize();
+  }
+  if (mode === 'settings') {
+    settingsWin = win;
+  } else {
+    historyWin = win;
+  }
 
-  // win.setMenu(null);
-  // win.setMenuBarVisibility(false);
-  // win.removeMenu();
-  Menu.setApplicationMenu(null);
-
+  const params = `mode=${mode}&shouldUseDarkColors=${nativeTheme.shouldUseDarkColors}`;
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
-    await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string);
+    await win.loadURL(
+      `${process.env.WEBPACK_DEV_SERVER_URL as string}?${params}`
+    );
     if (!process.env.IS_TEST) win.webContents.openDevTools();
   } else {
     createProtocol('app');
     // Load the index.html when not in development
-    win.loadURL('app://./index.html');
+    win.loadURL(`app://./index.html?${params}`);
   }
 
-  win.on('closed', () => {
-    win = null;
+  win.on('close', () => {
+    const settings = {
+      ...getSettings(),
+      [mode === 'settings' ? 'settingsWin' : 'historyWin']: {
+        position: win.isMaximized() ? undefined : win.getPosition(),
+        size: win.isMaximized() ? undefined : win.getSize(),
+        maximized: win.isMaximized()
+      }
+    };
+    setSettings(settings);
   });
 
-  win.on('blur', () => {
-    if (isDevelopment) {
-      if (win) {
-        win.close();
-      }
-      win = null;
+  win.on('closed', () => {
+    if (mode === 'settings') {
+      settingsWin = null;
+    } else {
+      historyWin = null;
     }
   });
 }
@@ -88,7 +125,7 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-  if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  if (BrowserWindow.getAllWindows().length === 0) createWindow('history');
 });
 
 // This method will be called when Electron has finished
@@ -103,7 +140,6 @@ app.on('ready', async () => {
       console.error('Vue Devtools failed to install:', e.toString());
     }
   }
-  registerShortcut();
 });
 
 // Exit cleanly on request from parent process in development mode.
@@ -121,47 +157,79 @@ if (isDevelopment) {
   }
 }
 
-if (!isDevelopment) {
-  app.setLoginItemSettings({
-    openAtLogin: true,
-    path: app.getPath('exe')
-  });
-}
+const sendToWebContents = () => {
+  const historyItems = getHistoryItems();
+  const settings = getSettings();
+  if (historyWin) {
+    historyWin.webContents.send('init-history', historyItems);
+    historyWin.webContents.send('init-settings', settings);
+  }
+  if (settingsWin) {
+    settingsWin.webContents.send('init-history', historyItems);
+    settingsWin.webContents.send('init-settings', settings);
+  }
+};
 
 ipcMain
-  .on('app-created', () => {
-    if (win) {
-      win.webContents.send('init-history', getHistoryItems());
-    }
+  .on('web-app-created', () => {
+    sendToWebContents();
   })
-  .on('app-clipboard-trash-clicked', (event, [text]) => {
-    let historyItems = getHistoryItems();
-    historyItems = historyItems.filter(item => item.text !== text);
-    setHistoryItems(historyItems);
-    restart();
-    if (win) {
-      win.webContents.send('init-history', historyItems);
-    }
+  .on('web-copy-click', (event, [text]: [string]) => {
+    clipboard.writeText(text);
   })
-  .on('clipboard-read', event => {
-    if (win) {
-      win.webContents.send('init-history', event);
-    }
+  .on('web-delete-click', (event, [text]: [string]) => {
+    deleteHistory(text);
+    sendToWebContents();
   })
-  .on('app-tray-open-click', () => {
-    if (win) {
-      win.focus();
+  .on('web-settings-change', (event, [settings]: [Settings]) => {
+    setSettings(settings);
+    restartMonitoring();
+    registerShortcut();
+    setOpenAtLogin();
+    sendToWebContents();
+  })
+  .on('app-menu-settings-click', () => {
+    if (settingsWin) {
+      settingsWin.focus();
     } else {
-      createWindow();
+      createWindow('settings');
+    }
+  })
+  .on('app-menu-delete-all-history-click', () => {
+    deleteAllHistory();
+    sendToWebContents();
+  })
+  .on('app-tray-icon-click', () => {
+    if (historyWin) {
+      historyWin.focus();
+    } else {
+      createWindow('history');
+    }
+  })
+  .on('app-tray-history-click', () => {
+    if (historyWin) {
+      historyWin.focus();
+    } else {
+      createWindow('history');
+    }
+  })
+  .on('app-tray-settings-click', () => {
+    if (settingsWin) {
+      settingsWin.focus();
+    } else {
+      createWindow('settings');
     }
   })
   .on('app-tray-exit-click', () => {
     app.quit();
   })
   .on('global-shortcut-focus', () => {
-    if (win) {
-      win.focus();
+    if (historyWin) {
+      historyWin.focus();
     } else {
-      createWindow();
+      createWindow('history');
     }
+  })
+  .on('clipboard-history-change', () => {
+    sendToWebContents();
   });

@@ -1,9 +1,16 @@
 <template>
   <v-app>
     <v-main>
+      <ClipboardSettings
+        v-if="mode === 'settings'"
+        :settings="settings"
+        @clipboard-settings-change="onClipboardSettingsChange"
+      />
       <ClipboardHistory
+        v-else
         :historyItems="historyItems"
-        @clipboard-trash-click="onClipboardTrashClick"
+        @clipboard-copy-click="onClipboardCopyClick"
+        @clipboard-delete-click="onClipboardDeleteClick"
       />
     </v-main>
   </v-app>
@@ -12,15 +19,21 @@
 <script lang="ts">
 import Vue from 'vue';
 import { HistoryItem } from '@/types/history-item';
+import { Settings } from '@/types/settings';
 import ClipboardHistory from '@/components/ClipboardHistory.vue';
+import ClipboardSettings from '@/components/ClipboardSettings.vue';
 
 export default Vue.extend({
   name: 'App',
 
-  components: { ClipboardHistory },
+  components: { ClipboardHistory, ClipboardSettings },
 
-  data(): { historyItems: HistoryItem[] } {
-    return { historyItems: [] };
+  data() {
+    return {
+      mode: 'history',
+      historyItems: [] as HistoryItem[],
+      settings: {} as Settings
+    };
   },
 
   computed: {
@@ -41,15 +54,32 @@ export default Vue.extend({
   },
 
   methods: {
-    onClipboardTrashClick(text: string) {
-      this.ipcBridge.send('app-clipboard-trash-clicked', text);
+    onClipboardCopyClick(text: string) {
+      this.ipcBridge.send('web-copy-click', text);
+    },
+    onClipboardDeleteClick(text: string) {
+      this.ipcBridge.send('web-delete-click', text);
+    },
+    onClipboardSettingsChange(settings: Settings) {
+      this.ipcBridge.send('web-settings-change', settings);
     }
   },
 
   created() {
-    this.ipcBridge.send('app-created');
+    const searchParams = new URL(window.location.href).searchParams;
+    const mode = searchParams.get('mode') || 'history';
+    const shouldUseDarkColors =
+      searchParams.get('shouldUseDarkColors') === 'true';
+
+    this.$vuetify.theme.dark = shouldUseDarkColors;
+    this.mode = mode;
+
+    this.ipcBridge.send('web-app-created');
     this.ipcBridge.on('init-history', (event, args) => {
       this.historyItems = args;
+    });
+    this.ipcBridge.on('init-settings', (event, args) => {
+      this.settings = args;
     });
   }
 });

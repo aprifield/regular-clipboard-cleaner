@@ -11,7 +11,12 @@
     </v-card-title>
     <v-data-table
       ref="dataTable"
-      :headers="[{ value: 'row' }, { value: 'text' }, { value: 'trash' }]"
+      :headers="[
+        { value: 'row' },
+        { value: 'text' },
+        { value: 'copy' },
+        { value: 'delete' }
+      ]"
       :items="computedHistoryItems"
       :items-per-page="9999"
       hide-default-header
@@ -19,17 +24,31 @@
       :mobile-breakpoint="0"
       :search="search"
     >
-      <template v-slot:[`item.text`]="{ item }">
-        <div class="text-truncate clipboard-text">
-          {{ item.text }}
-        </div>
-      </template>
-      <template v-slot:[`item.trash`]="{ item }">
-        <v-btn icon class="trash-button">
-          <v-icon @click="$emit('clipboard-trash-click', item.text)">
-            mdi-trash-can-outline
-          </v-icon>
-        </v-btn>
+      <template v-slot:item="{ item }">
+        <tr>
+          <td class="pr-0">
+            {{ item.row }}
+          </td>
+          <td>
+            <div class="text-truncate clipboard-text">
+              {{ item.text }}
+            </div>
+          </td>
+          <td class="pa-0">
+            <v-btn icon class="action-button" title="Copy to clipboard">
+              <v-icon @click="$emit('clipboard-copy-click', item.text)">
+                mdi-clipboard-outline
+              </v-icon>
+            </v-btn>
+          </td>
+          <td class="pa-0">
+            <v-btn icon class="action-button" title="Delete">
+              <v-icon @click="$emit('clipboard-delete-click', item.text)">
+                mdi-trash-can-outline
+              </v-icon>
+            </v-btn>
+          </td>
+        </tr>
       </template>
     </v-data-table>
   </v-card>
@@ -74,13 +93,13 @@ export default Vue.extend({
 
 <style scoped lang="scss">
 .clipboard-text {
-  width: calc(100vw - 180px);
+  width: calc(100vw - 150px);
 }
-.trash-button {
+.action-button {
   visibility: hidden;
 }
 .v-data-table tr:hover {
-  .trash-button {
+  .action-button {
     visibility: initial;
   }
 }

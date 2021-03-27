@@ -5,13 +5,17 @@ import path from 'path';
 let tray = null;
 
 app.whenReady().then(() => {
-  tray = new Tray(nativeImage.createFromPath(path.join(__static, 'icon.png')));
-
   const contextMenu = Menu.buildFromTemplate([
     {
-      label: 'Open',
+      label: 'History',
       click: () => {
-        ipcMain.emit('app-tray-open-click');
+        ipcMain.emit('app-tray-history-click');
+      }
+    },
+    {
+      label: 'Settings',
+      click: () => {
+        ipcMain.emit('app-tray-settings-click');
       }
     },
     {
@@ -21,10 +25,10 @@ app.whenReady().then(() => {
       }
     }
   ]);
+
+  tray = new Tray(nativeImage.createFromPath(path.join(__static, 'icon.png')));
   tray.setContextMenu(contextMenu);
-
   tray.setToolTip(app.getName());
-
   tray.on('click', function() {
     ipcMain.emit('app-tray-icon-click');
   });
