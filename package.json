@@ -1,7 +1,14 @@
 {
   "name": "regular-clipboard-cleaner",
-  "version": "0.1.0",
-  "private": true,
+  "description": "Clear the clipboard regularly",
+  "productName": "Regular Clipboard Cleaner",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": "aprifield",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aprifield/regular-clipboard-cleaner.git"
+  },
   "scripts": {
     "lint": "vue-cli-service lint",
     "electron:build": "vue-cli-service electron:build",

@@ -34,8 +34,6 @@ if (!gotTheLock) {
   app.quit();
 }
 
-app.setName('Regular Clipboard Cleaner');
-
 let historyWin: BrowserWindow | null;
 let settingsWin: BrowserWindow | null;
 
