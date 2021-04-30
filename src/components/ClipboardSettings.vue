@@ -20,6 +20,14 @@
               >
               </v-switch>
             </v-list-item>
+            <v-list-item>
+              <v-switch
+                label="Close the history window after copying"
+                :input-value="settings.closeAfterCopy"
+                @change="onClipboardSettingsChange({ closeAfterCopy: $event })"
+              >
+              </v-switch>
+            </v-list-item>
             <v-divider class="pa-2"></v-divider>
             <v-list-item>
               <v-text-field

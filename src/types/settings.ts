@@ -1,6 +1,7 @@
 export interface Settings {
   startAtLogin?: boolean;
   maintained?: boolean;
+  closeAfterCopy?: boolean;
   monitorInterval?: number;
   clearInterval?: number;
   shortcut?: {

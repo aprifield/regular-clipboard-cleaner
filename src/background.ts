@@ -189,6 +189,11 @@ ipcMain
   )
   .on('web-copy-click', (event, [text]: [string]) => {
     clipboard.writeText(text);
+    if (getSettings().closeAfterCopy) {
+      if (historyWin) {
+        historyWin.close();
+      }
+    }
   })
   .on('web-delete-click', (event, [text]: [string]) => {
     deleteHistory(text);
