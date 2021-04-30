@@ -57,6 +57,8 @@ async function createWindow(mode: 'history' | 'settings') {
     height: settings.size[1],
     x: settings.position[0],
     y: settings.position[1],
+    icon: path.join(__static, 'icon.png'),
+    show: false,
     webPreferences: {
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
@@ -65,19 +67,15 @@ async function createWindow(mode: 'history' | 'settings') {
       nodeIntegration: false,
       contextIsolation: true,
       preload: path.join(__dirname, 'preload.js')
-    },
-    icon: path.join(__static, 'icon.png')
+    }
   });
-  if (settings.maximized) {
-    win.maximize();
-  }
   if (mode === 'settings') {
     settingsWin = win;
   } else {
     historyWin = win;
   }
 
-  const params = `mode=${mode}&shouldUseDarkColors=${nativeTheme.shouldUseDarkColors}`;
+  const params = `mode=${mode}&maximized=${settings.maximized}&shouldUseDarkColors=${nativeTheme.shouldUseDarkColors}`;
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     await win.loadURL(
@@ -172,6 +170,23 @@ ipcMain
   .on('web-app-created', () => {
     sendToWebContents();
   })
+  .on(
+    'web-app-mounted',
+    (
+      event,
+      [{ mode, maximized }]: [
+        { mode: 'history' | 'settings'; maximized: boolean }
+      ]
+    ) => {
+      const win = mode === 'settings' ? settingsWin : historyWin;
+      if (win) {
+        if (maximized) {
+          win.maximize();
+        }
+        win.show();
+      }
+    }
+  )
   .on('web-copy-click', (event, [text]: [string]) => {
     clipboard.writeText(text);
   })
