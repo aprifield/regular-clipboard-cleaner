@@ -89,22 +89,27 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-.v-data-table tr {
-  .clipboard-text {
-    display: inline-block;
-    vertical-align: middle;
-    width: calc(100vw - 90px);
+.v-data-table {
+  ::v-deep .v-data-table__wrapper {
+    overflow-x: hidden;
   }
-  .action-button {
-    display: none;
-  }
-  &:hover {
+  tr {
     .clipboard-text {
-      padding-right: 10px;
-      width: calc(100vw - 160px);
+      display: inline-block;
+      vertical-align: middle;
+      width: calc(100vw - 110px);
     }
     .action-button {
-      display: inline-flex;
+      display: none;
+    }
+    &:hover {
+      .clipboard-text {
+        padding-right: 10px;
+        width: calc(100vw - 180px);
+      }
+      .action-button {
+        display: inline-flex;
+      }
     }
   }
 }
