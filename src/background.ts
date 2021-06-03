@@ -34,6 +34,10 @@ const gotTheLock = app.requestSingleInstanceLock();
 
 if (!gotTheLock) {
   app.quit();
+} else {
+  app.on('second-instance', () => {
+    showOrCreateWindow('history');
+  });
 }
 
 let historyWin: BrowserWindow | null;
