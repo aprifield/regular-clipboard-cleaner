@@ -4,11 +4,13 @@
       <v-card flat>
         <v-card-title>
           <v-text-field
+            ref="textField"
             v-model="search"
             append-icon="mdi-magnify"
-            label="Search"
-            single-line
+            dense
             hide-details
+            label="Search (press /)"
+            single-line
           ></v-text-field>
         </v-card-title>
         <v-card-text>
@@ -105,7 +107,10 @@ export default Vue.extend({
         return;
       }
 
-      if (event.code === 'Enter') {
+      if (event.code === 'Slash') {
+        event.preventDefault();
+        (this.$refs.textField as Vue).$el.querySelector('input')?.focus();
+      } else if (event.code === 'Enter') {
         event.preventDefault();
         if (this.tableHistoryItems[this.selectedIndex]) {
           this.$emit(
@@ -115,6 +120,7 @@ export default Vue.extend({
         }
       } else if (event.code === 'ArrowDown' || event.code === 'ArrowUp') {
         event.preventDefault();
+        (this.$refs.textField as Vue).$el.querySelector('input')?.blur();
         const selectedItem = this.tableHistoryItems[this.selectedIndex];
         const currentIndex = this.currentHistoryItems.indexOf(selectedItem);
         const nextIndex =
