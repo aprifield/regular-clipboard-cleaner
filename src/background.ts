@@ -14,7 +14,9 @@ import path from 'path';
 import {
   getHistoryItems,
   getSettings,
-  setSettings
+  getWindowSettings,
+  setSettings,
+  setWindowSettings
 } from '@/background/electron-store-helper';
 import '@/background/app-tray-helper';
 import '@/background/app-menu-helper';
@@ -43,20 +45,18 @@ protocol.registerSchemesAsPrivileged([
 ]);
 
 async function createWindow(mode: 'history' | 'settings') {
-  const settings = {
+  const windowSettings = {
     position: [undefined, undefined],
     size: [800, 600],
-    ...(mode === 'settings'
-      ? getSettings().settingsWin || {}
-      : getSettings().historyWin || {})
+    ...getWindowSettings(mode)
   };
 
   // Create the browser window.
   const win = new BrowserWindow({
-    width: settings.size[0],
-    height: settings.size[1],
-    x: settings.position[0],
-    y: settings.position[1],
+    width: windowSettings.size[0],
+    height: windowSettings.size[1],
+    x: windowSettings.position[0],
+    y: windowSettings.position[1],
     icon: path.join(__static, 'icon.png'),
     show: false,
     webPreferences: {
@@ -75,7 +75,7 @@ async function createWindow(mode: 'history' | 'settings') {
     historyWin = win;
   }
 
-  const params = `mode=${mode}&maximized=${settings.maximized}&shouldUseDarkColors=${nativeTheme.shouldUseDarkColors}`;
+  const params = `mode=${mode}&shouldUseDarkColors=${nativeTheme.shouldUseDarkColors}`;
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     await win.loadURL(
@@ -89,15 +89,17 @@ async function createWindow(mode: 'history' | 'settings') {
   }
 
   win.on('close', () => {
-    const settings = {
-      ...getSettings(),
-      [mode === 'settings' ? 'settingsWin' : 'historyWin']: {
-        position: win.isMaximized() ? undefined : win.getPosition(),
-        size: win.isMaximized() ? undefined : win.getSize(),
-        maximized: win.isMaximized()
-      }
-    };
-    setSettings(settings);
+    setWindowSettings(mode, {
+      ...(win.isMaximized()
+        ? {
+            maximized: win.isMaximized()
+          }
+        : {
+            position: win.getPosition(),
+            size: win.getSize(),
+            maximized: win.isMaximized()
+          })
+    });
   });
 
   win.on('closed', () => {
@@ -107,6 +109,19 @@ async function createWindow(mode: 'history' | 'settings') {
       historyWin = null;
     }
   });
+}
+
+async function showOrCreateWindow(mode: 'history' | 'settings') {
+  const win = mode === 'settings' ? settingsWin : historyWin;
+  if (win) {
+    const windowSettings = getWindowSettings(mode);
+    if (windowSettings && windowSettings.maximized) {
+      win.maximize();
+    }
+    win.show();
+  } else {
+    createWindow(mode);
+  }
 }
 
 // Quit when all windows are closed.
@@ -172,19 +187,8 @@ ipcMain
   })
   .on(
     'web-app-mounted',
-    (
-      event,
-      [{ mode, maximized }]: [
-        { mode: 'history' | 'settings'; maximized: boolean }
-      ]
-    ) => {
-      const win = mode === 'settings' ? settingsWin : historyWin;
-      if (win) {
-        if (maximized) {
-          win.maximize();
-        }
-        win.show();
-      }
+    (event, [{ mode }]: [{ mode: 'history' | 'settings' }]) => {
+      showOrCreateWindow(mode);
     }
   )
   .on('web-copy-click', (event, [text]: [string]) => {
@@ -207,46 +211,26 @@ ipcMain
     sendToWebContents();
   })
   .on('app-menu-settings-click', () => {
-    if (settingsWin) {
-      settingsWin.focus();
-    } else {
-      createWindow('settings');
-    }
+    showOrCreateWindow('settings');
   })
   .on('app-menu-delete-all-history-click', () => {
     deleteAllHistory();
     sendToWebContents();
   })
   .on('app-tray-icon-click', () => {
-    if (historyWin) {
-      historyWin.focus();
-    } else {
-      createWindow('history');
-    }
+    showOrCreateWindow('history');
   })
   .on('app-tray-history-click', () => {
-    if (historyWin) {
-      historyWin.focus();
-    } else {
-      createWindow('history');
-    }
+    showOrCreateWindow('history');
   })
   .on('app-tray-settings-click', () => {
-    if (settingsWin) {
-      settingsWin.focus();
-    } else {
-      createWindow('settings');
-    }
+    showOrCreateWindow('settings');
   })
   .on('app-tray-exit-click', () => {
     app.quit();
   })
   .on('global-shortcut-focus', () => {
-    if (historyWin) {
-      historyWin.focus();
-    } else {
-      createWindow('history');
-    }
+    showOrCreateWindow('history');
   })
   .on('clipboard-history-change', () => {
     sendToWebContents();

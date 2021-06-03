@@ -31,7 +31,6 @@ export default Vue.extend({
   data() {
     return {
       mode: 'history',
-      maximized: false,
       historyItems: [] as HistoryItem[],
       settings: {} as Settings
     };
@@ -69,13 +68,11 @@ export default Vue.extend({
   created() {
     const searchParams = new URL(window.location.href).searchParams;
     const mode = searchParams.get('mode') || 'history';
-    const maximized = searchParams.get('maximized') === 'true';
     const shouldUseDarkColors =
       searchParams.get('shouldUseDarkColors') === 'true';
 
     this.$vuetify.theme.dark = shouldUseDarkColors;
     this.mode = mode;
-    this.maximized = maximized;
 
     this.ipcBridge.send('web-app-created');
     this.ipcBridge.on('init-history', (event, args) => {
@@ -88,8 +85,7 @@ export default Vue.extend({
 
   mounted() {
     this.ipcBridge.send('web-app-mounted', {
-      mode: this.mode,
-      maximized: this.maximized
+      mode: this.mode
     });
   }
 });

@@ -1,5 +1,5 @@
 import { HistoryItem } from '@/types/history-item';
-import { Settings } from '@/types/settings';
+import { Settings, WindowSettings } from '@/types/settings';
 import Store from 'electron-store';
 
 const clipboardStore = new Store<{ clipboard: HistoryItem[] }>({
@@ -19,37 +19,72 @@ const settingsStore = new Store<{ settings: Settings }>({
 console.log('[electron-store-helper] path', clipboardStore.path);
 console.log('[electron-store-helper] path', settingsStore.path);
 
-let historyItemsInMemory: HistoryItem[] = [];
+let historyItemsInMemory: HistoryItem[] | undefined;
+let settingsInMemory: Settings | undefined;
 
 export function getSettings() {
-  return settingsStore.get('settings');
+  if (settingsInMemory) {
+    return settingsInMemory;
+  }
+
+  settingsInMemory = settingsStore.get('settings');
+  return settingsInMemory;
 }
 
 export function setSettings(settings: Settings) {
   console.log('[electron-store-helper] setSettings settings', settings);
-  const oldSettings = settingsStore.get('settings');
-  if (oldSettings.maintained && !settings.maintained) {
-    historyItemsInMemory = clipboardStore.get('clipboard');
+
+  const oldMaintained = getSettings().maintained;
+  const newMaintained = settings.maintained;
+
+  if (oldMaintained && !newMaintained) {
     clipboardStore.set('clipboard', []);
-  } else if (!oldSettings.maintained && settings.maintained) {
+  } else if (!oldMaintained && newMaintained) {
     clipboardStore.set('clipboard', historyItemsInMemory);
-    historyItemsInMemory = [];
   }
+
+  settingsInMemory = settings;
   settingsStore.set('settings', settings);
 }
 
+export function getWindowSettings(mode: 'history' | 'settings') {
+  const window = getSettings().window;
+  return window
+    ? window[mode === 'settings' ? 'settings' : 'history']
+    : undefined;
+}
+
+export function setWindowSettings(
+  mode: 'history' | 'settings',
+  windowSettings: WindowSettings
+) {
+  const settings: Settings = {
+    ...getSettings(),
+    window: {
+      ...getSettings().window,
+      [mode === 'settings' ? 'settings' : 'history']: {
+        ...getWindowSettings(mode),
+        ...windowSettings
+      }
+    }
+  };
+  setSettings(settings);
+}
+
 export function getHistoryItems() {
-  if (settingsStore.get('settings').maintained) {
-    return clipboardStore.get('clipboard');
-  } else {
+  if (historyItemsInMemory) {
     return historyItemsInMemory;
   }
+
+  historyItemsInMemory = getSettings().maintained
+    ? clipboardStore.get('clipboard')
+    : [];
+  return historyItemsInMemory;
 }
 
 export function setHistoryItems(historyItems: HistoryItem[]) {
-  if (settingsStore.get('settings').maintained) {
+  historyItemsInMemory = historyItems;
+  if (getSettings().maintained) {
     clipboardStore.set('clipboard', historyItems);
-  } else {
-    historyItemsInMemory = historyItems;
   }
 }

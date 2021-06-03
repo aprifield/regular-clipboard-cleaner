@@ -10,14 +10,14 @@ export interface Settings {
     shift?: boolean;
     key?: string;
   };
-  historyWin?: {
-    position?: number[];
-    size?: number[];
-    maximized?: boolean;
+  window?: {
+    history?: WindowSettings;
+    settings?: WindowSettings;
   };
-  settingsWin?: {
-    position?: number[];
-    size?: number[];
-    maximized?: boolean;
-  };
+}
+
+export interface WindowSettings {
+  position?: number[];
+  size?: number[];
+  maximized?: boolean;
 }

@@ -4,18 +4,14 @@ import {
   getSettings,
   setHistoryItems
 } from '@/background/electron-store-helper';
-import { HistoryItem } from '@/types/history-item';
-import { Settings } from '@/types/settings';
 
 const MAX_LENGTH = 100;
 
 let timeoutId: NodeJS.Timeout;
-let historyItems: HistoryItem[];
-let settings: Settings;
 
 function startMonitoring() {
-  historyItems = getHistoryItems();
-  settings = getSettings();
+  const historyItems = getHistoryItems();
+  const settings = getSettings();
 
   const monitorInterval =
     settings.monitorInterval !== undefined &&
@@ -44,7 +40,10 @@ function startMonitoring() {
       (historyItems[0] &&
         (historyItems[0].text !== text || historyItems[0].cleared))
     ) {
-      historyItems = historyItems.filter(item => item.text !== text);
+      const index = historyItems.findIndex(item => item.text === text);
+      if (0 <= index) {
+        historyItems.splice(index, 1);
+      }
       historyItems.unshift({ text, time });
       if (MAX_LENGTH < historyItems.length) {
         historyItems.length = MAX_LENGTH;
@@ -75,7 +74,11 @@ export function deleteHistory(removedText: string) {
     clipboard.clear();
   }
 
-  historyItems = historyItems.filter(item => item.text !== removedText);
+  const historyItems = getHistoryItems();
+  const index = historyItems.findIndex(item => item.text === removedText);
+  if (0 <= index) {
+    historyItems.splice(index, 1);
+  }
   setHistoryItems(historyItems);
 
   restartMonitoring();
@@ -84,8 +87,7 @@ export function deleteHistory(removedText: string) {
 export function deleteAllHistory() {
   clipboard.clear();
 
-  historyItems = [];
-  setHistoryItems(historyItems);
+  setHistoryItems([]);
 
   restartMonitoring();
 }
