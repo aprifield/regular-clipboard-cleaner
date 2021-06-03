@@ -11,6 +11,7 @@
         :historyItems="historyItems"
         @clipboard-copy-click="onClipboardCopyClick"
         @clipboard-delete-click="onClipboardDeleteClick"
+        @clipboard-enter-keydown="onClipboardEnterKeyDown"
       />
     </v-main>
   </v-app>
@@ -59,6 +60,9 @@ export default Vue.extend({
     },
     onClipboardDeleteClick(text: string) {
       this.ipcBridge.send('web-delete-click', text);
+    },
+    onClipboardEnterKeyDown(text: string) {
+      this.ipcBridge.send('web-enter-keydown', text);
     },
     onClipboardSettingsChange(settings: Settings) {
       this.ipcBridge.send('web-settings-change', settings);

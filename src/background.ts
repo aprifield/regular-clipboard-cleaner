@@ -113,6 +113,10 @@ async function createWindow(mode: 'history' | 'settings') {
       historyWin = null;
     }
   });
+
+  win.on('minimize', () => {
+    win.hide();
+  });
 }
 
 async function showOrCreateWindow(mode: 'history' | 'settings') {
@@ -199,7 +203,15 @@ ipcMain
     clipboard.writeText(text);
     if (getSettings().closeAfterCopy) {
       if (historyWin) {
-        historyWin.close();
+        historyWin.minimize();
+      }
+    }
+  })
+  .on('web-enter-keydown', (event, [text]: [string]) => {
+    clipboard.writeText(text);
+    if (getSettings().closeAfterCopy) {
+      if (historyWin) {
+        historyWin.minimize();
       }
     }
   })

@@ -15,15 +15,18 @@
           <v-data-table
             ref="dataTable"
             :headers="[{ value: 'row' }, { value: 'text' }]"
-            :items="computedHistoryItems"
-            :items-per-page="9999"
+            :items="tableHistoryItems"
+            :custom-filter="customFilter"
+            disable-pagination
+            dense
             hide-default-header
             hide-default-footer
             :mobile-breakpoint="0"
             :search="search"
+            @current-items="onCurrentItemsChange"
           >
             <template v-slot:item="{ item }">
-              <tr>
+              <tr :class="{ active: item.index === selectedIndex }">
                 <td class="pr-0">
                   {{ item.row }}
                 </td>
@@ -52,25 +55,74 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import Vue, { PropType } from 'vue';
 import { HistoryItem } from '@/types/history-item';
+
+interface TableHistoryItems extends HistoryItem {
+  index: number;
+  row: number;
+}
 
 export default Vue.extend({
   name: 'ClipboardHistory',
 
   props: {
-    historyItems: { type: Array, default: () => [] }
+    historyItems: { type: Array as PropType<HistoryItem[]>, default: () => [] }
   },
 
   data() {
-    return { search: '' };
+    return {
+      search: '',
+      selectedIndex: -1,
+      currentHistoryItems: [] as TableHistoryItems[]
+    };
   },
 
   computed: {
-    computedHistoryItems(): Array<HistoryItem & { row: number }> {
+    tableHistoryItems(): TableHistoryItems[] {
       return this.historyItems.map((item, index) => {
-        return { ...(item as HistoryItem), row: index + 1 };
+        return { ...item, index, row: index + 1 };
       });
+    }
+  },
+
+  methods: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    customFilter(value: any, search: string | null, item: TableHistoryItems) {
+      return search
+        ? item.row + '' === search ||
+            item.text.toLocaleLowerCase().includes(search.toLocaleLowerCase())
+        : true;
+    },
+    onCurrentItemsChange(historyItems: TableHistoryItems[]) {
+      this.currentHistoryItems = historyItems;
+      this.selectedIndex = this.currentHistoryItems[0]
+        ? this.currentHistoryItems[0].index
+        : -1;
+    },
+    onWindowKeyDown(event: KeyboardEvent) {
+      if (event.isComposing) {
+        return;
+      }
+
+      if (event.code === 'Enter') {
+        event.preventDefault();
+        if (this.tableHistoryItems[this.selectedIndex]) {
+          this.$emit(
+            'clipboard-enter-keydown',
+            this.tableHistoryItems[this.selectedIndex].text
+          );
+        }
+      } else if (event.code === 'ArrowDown' || event.code === 'ArrowUp') {
+        event.preventDefault();
+        const selectedItem = this.tableHistoryItems[this.selectedIndex];
+        const currentIndex = this.currentHistoryItems.indexOf(selectedItem);
+        const nextIndex =
+          event.code === 'ArrowDown' ? currentIndex + 1 : currentIndex - 1;
+        if (this.currentHistoryItems[nextIndex]) {
+          this.selectedIndex = this.currentHistoryItems[nextIndex].index;
+        }
+      }
     }
   },
 
@@ -79,11 +131,18 @@ export default Vue.extend({
       newHistoryItems: HistoryItem[],
       oldHistoryItems: HistoryItem[]
     ) {
-      if (newHistoryItems.length < oldHistoryItems.length) {
-        return;
+      if (oldHistoryItems.length < newHistoryItems.length) {
+        this.$vuetify.goTo(this.$refs.dataTable as Vue);
       }
-      this.$vuetify.goTo(this.$refs.dataTable as Vue);
     }
+  },
+
+  mounted() {
+    window.addEventListener('keydown', this.onWindowKeyDown);
+  },
+
+  destroyed() {
+    window.removeEventListener('keydown', this.onWindowKeyDown);
   }
 });
 </script>
@@ -100,7 +159,7 @@ export default Vue.extend({
       width: calc(100vw - 110px);
     }
     .action-button {
-      display: none;
+      visibility: hidden;
     }
     &:hover {
       .clipboard-text {
@@ -108,7 +167,7 @@ export default Vue.extend({
         width: calc(100vw - 180px);
       }
       .action-button {
-        display: inline-flex;
+        visibility: visible;
       }
     }
   }
