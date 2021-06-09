@@ -73,6 +73,12 @@ async function createWindow(mode: 'history' | 'settings') {
       preload: path.join(__dirname, 'preload.js')
     }
   });
+  win.setBounds({
+    width: windowSettings.size[0],
+    height: windowSettings.size[1],
+    x: windowSettings.position[0],
+    y: windowSettings.position[1]
+  });
   if (mode === 'settings') {
     settingsWin = win;
   } else {
