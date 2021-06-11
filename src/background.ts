@@ -98,7 +98,7 @@ async function createWindow(mode: 'history' | 'settings') {
     win.loadURL(`app://./index.html?${params}`);
   }
 
-  win.on('close', () => {
+  let _setWindowSettings = () => {
     setWindowSettings(mode, {
       ...(win.isMaximized()
         ? {
@@ -110,7 +110,7 @@ async function createWindow(mode: 'history' | 'settings') {
             maximized: win.isMaximized()
           })
     });
-  });
+  };
 
   win.on('closed', () => {
     if (mode === 'settings') {
@@ -123,6 +123,22 @@ async function createWindow(mode: 'history' | 'settings') {
   win.on('minimize', () => {
     win.hide();
   });
+
+  win.on('moved', () => {
+    _setWindowSettings();
+  });
+
+  win.on('resized', () => {
+    _setWindowSettings();
+  });
+
+  win.on('maximize', () => {
+    _setWindowSettings();
+  });
+
+  win.on('unmaximize', () => {
+    _setWindowSettings();
+  });
 }
 
 async function showOrCreateWindow(mode: 'history' | 'settings') {
@@ -133,6 +149,14 @@ async function showOrCreateWindow(mode: 'history' | 'settings') {
       win.maximize();
     }
     win.show();
+    if (windowSettings && windowSettings.size && windowSettings.position) {
+      win.setBounds({
+        width: windowSettings.size[0],
+        height: windowSettings.size[1],
+        x: windowSettings.position[0],
+        y: windowSettings.position[1]
+      });
+    }
   } else {
     createWindow(mode);
   }
@@ -219,6 +243,11 @@ ipcMain
       if (historyWin) {
         historyWin.minimize();
       }
+    }
+  })
+  .on('web-escape-keydown', () => {
+    if (historyWin) {
+      historyWin.minimize();
     }
   })
   .on('web-delete-click', (event, [text]: [string]) => {

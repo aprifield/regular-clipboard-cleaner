@@ -12,6 +12,7 @@
         @clipboard-copy-click="onClipboardCopyClick"
         @clipboard-delete-click="onClipboardDeleteClick"
         @clipboard-enter-keydown="onClipboardEnterKeyDown"
+        @clipboard-escape-keydown="onClipboardEscapeKeyDown"
       />
     </v-main>
   </v-app>
@@ -63,6 +64,9 @@ export default Vue.extend({
     },
     onClipboardEnterKeyDown(text: string) {
       this.ipcBridge.send('web-enter-keydown', text);
+    },
+    onClipboardEscapeKeyDown() {
+      this.ipcBridge.send('web-escape-keydown');
     },
     onClipboardSettingsChange(settings: Settings) {
       this.ipcBridge.send('web-settings-change', settings);

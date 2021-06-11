@@ -11,6 +11,8 @@
             hide-details
             label="Search (press /)"
             single-line
+            @focus="isFocused = true"
+            @blur="isFocused = false"
           ></v-text-field>
         </v-card-title>
         <v-card-text>
@@ -75,6 +77,7 @@ export default Vue.extend({
   data() {
     return {
       search: '',
+      isFocused: false,
       selectedIndex: -1,
       currentHistoryItems: [] as TableHistoryItems[]
     };
@@ -98,18 +101,22 @@ export default Vue.extend({
     },
     onCurrentItemsChange(historyItems: TableHistoryItems[]) {
       this.currentHistoryItems = historyItems;
-      this.selectedIndex = this.currentHistoryItems[0]
-        ? this.currentHistoryItems[0].index
-        : -1;
+      this.selectedIndex = -1;
     },
     onWindowKeyDown(event: KeyboardEvent) {
       if (event.isComposing) {
         return;
       }
 
-      if (event.code === 'Slash') {
+      if (event.code === 'Escape') {
         event.preventDefault();
-        (this.$refs.textField as Vue).$el.querySelector('input')?.focus();
+        this.$emit('clipboard-escape-keydown');
+        this.search = '';
+      } else if (event.code === 'Slash') {
+        if (!this.isFocused) {
+          event.preventDefault();
+          (this.$refs.textField as Vue).$el.querySelector('input')?.focus();
+        }
       } else if (event.code === 'Enter') {
         event.preventDefault();
         if (this.tableHistoryItems[this.selectedIndex]) {
@@ -120,13 +127,21 @@ export default Vue.extend({
         }
       } else if (event.code === 'ArrowDown' || event.code === 'ArrowUp') {
         event.preventDefault();
-        (this.$refs.textField as Vue).$el.querySelector('input')?.blur();
-        const selectedItem = this.tableHistoryItems[this.selectedIndex];
-        const currentIndex = this.currentHistoryItems.indexOf(selectedItem);
-        const nextIndex =
-          event.code === 'ArrowDown' ? currentIndex + 1 : currentIndex - 1;
-        if (this.currentHistoryItems[nextIndex]) {
-          this.selectedIndex = this.currentHistoryItems[nextIndex].index;
+        if (this.isFocused) {
+          (this.$refs.textField as Vue).$el.querySelector('input')?.blur();
+        }
+        if (this.selectedIndex === -1) {
+          if (this.currentHistoryItems[0]) {
+            this.selectedIndex = this.currentHistoryItems[0].index;
+          }
+        } else {
+          const selectedItem = this.tableHistoryItems[this.selectedIndex];
+          const currentIndex = this.currentHistoryItems.indexOf(selectedItem);
+          const nextIndex =
+            event.code === 'ArrowDown' ? currentIndex + 1 : currentIndex - 1;
+          if (this.currentHistoryItems[nextIndex]) {
+            this.selectedIndex = this.currentHistoryItems[nextIndex].index;
+          }
         }
       }
     }
