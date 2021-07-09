@@ -39,7 +39,14 @@
                     {{ item.text }}
                   </div>
                   <v-btn icon class="action-button" title="Copy to clipboard">
-                    <v-icon @click="$emit('clipboard-copy-click', item.text)">
+                    <v-icon
+                      @click="
+                        () => {
+                          $emit('clipboard-copy-click', item.text);
+                          search = '';
+                        }
+                      "
+                    >
                       mdi-clipboard-outline
                     </v-icon>
                   </v-btn>
@@ -124,6 +131,7 @@ export default Vue.extend({
             'clipboard-enter-keydown',
             this.tableHistoryItems[this.selectedIndex].text
           );
+          this.search = '';
         }
       } else if (event.code === 'ArrowDown' || event.code === 'ArrowUp') {
         event.preventDefault();
