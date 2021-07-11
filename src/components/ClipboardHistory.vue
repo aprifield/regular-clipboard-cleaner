@@ -29,8 +29,8 @@
             :search="search"
             @current-items="onCurrentItemsChange"
           >
-            <template v-slot:item="{ item }">
-              <tr :class="{ active: item.index === selectedIndex }">
+            <template v-slot:item="{ item, index }">
+              <tr :id="`clipboard-row-${index}`">
                 <td class="pr-0">
                   {{ item.row }}
                 </td>
@@ -43,7 +43,7 @@
                       @click="
                         () => {
                           $emit('clipboard-copy-click', item.text);
-                          search = '';
+                          initStatus();
                         }
                       "
                     >
@@ -99,6 +99,18 @@ export default Vue.extend({
   },
 
   methods: {
+    initStatus() {
+      if (this.selectedIndex !== -1) {
+        const selectedRow = document.querySelector(
+          `#clipboard-row-${this.selectedIndex}`
+        );
+        if (selectedRow) {
+          selectedRow.classList.remove('active');
+        }
+      }
+      this.search = '';
+      this.selectedIndex = -1;
+    },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     customFilter(value: any, search: string | null, item: TableHistoryItems) {
       return search
@@ -126,29 +138,36 @@ export default Vue.extend({
         }
       } else if (event.code === 'Enter') {
         event.preventDefault();
-        if (this.tableHistoryItems[this.selectedIndex]) {
+        if (this.currentHistoryItems[this.selectedIndex]) {
           this.$emit(
             'clipboard-enter-keydown',
-            this.tableHistoryItems[this.selectedIndex].text
+            this.currentHistoryItems[this.selectedIndex].text
           );
-          this.search = '';
+          this.initStatus();
         }
       } else if (event.code === 'ArrowDown' || event.code === 'ArrowUp') {
         event.preventDefault();
         if (this.isFocused) {
           (this.$refs.textField as Vue).$el.querySelector('input')?.blur();
         }
-        if (this.selectedIndex === -1) {
-          if (this.currentHistoryItems[0]) {
-            this.selectedIndex = this.currentHistoryItems[0].index;
+        const prevIndex = this.selectedIndex;
+        const nextIndex =
+          event.code === 'ArrowDown'
+            ? this.selectedIndex + 1
+            : this.selectedIndex - 1;
+        if (this.currentHistoryItems[nextIndex]) {
+          if (this.currentHistoryItems[prevIndex]) {
+            const prevRow = document.querySelector(
+              `#clipboard-row-${prevIndex}`
+            );
+            if (prevRow) {
+              prevRow.classList.remove('active');
+            }
           }
-        } else {
-          const selectedItem = this.tableHistoryItems[this.selectedIndex];
-          const currentIndex = this.currentHistoryItems.indexOf(selectedItem);
-          const nextIndex =
-            event.code === 'ArrowDown' ? currentIndex + 1 : currentIndex - 1;
-          if (this.currentHistoryItems[nextIndex]) {
-            this.selectedIndex = this.currentHistoryItems[nextIndex].index;
+          const nextRow = document.querySelector(`#clipboard-row-${nextIndex}`);
+          if (nextRow) {
+            nextRow.classList.add('active');
+            this.selectedIndex = nextIndex;
           }
         }
       }
