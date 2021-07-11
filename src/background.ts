@@ -120,10 +120,6 @@ async function createWindow(mode: 'history' | 'settings') {
     }
   });
 
-  win.on('minimize', () => {
-    win.hide();
-  });
-
   win.on('moved', () => {
     _setWindowSettings();
   });
@@ -157,8 +153,18 @@ async function showOrCreateWindow(mode: 'history' | 'settings') {
         y: windowSettings.position[1]
       });
     }
+    win.setOpacity(1);
   } else {
     createWindow(mode);
+  }
+}
+
+async function hideWindow(mode: 'history' | 'settings') {
+  const win = mode === 'settings' ? settingsWin : historyWin;
+  if (win) {
+    win.setOpacity(0);
+    win.minimize();
+    win.hide();
   }
 }
 
@@ -233,7 +239,7 @@ ipcMain
     clipboard.writeText(text);
     if (getSettings().closeAfterCopy) {
       if (historyWin) {
-        historyWin.minimize();
+        hideWindow('history');
       }
     }
   })
@@ -241,13 +247,13 @@ ipcMain
     clipboard.writeText(text);
     if (getSettings().closeAfterCopy) {
       if (historyWin) {
-        historyWin.minimize();
+        hideWindow('history');
       }
     }
   })
   .on('web-escape-keydown', () => {
     if (historyWin) {
-      historyWin.minimize();
+      hideWindow('history');
     }
   })
   .on('web-delete-click', (event, [text]: [string]) => {
