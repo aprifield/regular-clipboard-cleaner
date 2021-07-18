@@ -10,6 +10,8 @@ export interface Settings {
     shift?: boolean;
     key?: string;
   };
+  command?: string;
+  commandTimeout?: number;
   window?: {
     history?: WindowSettings;
     settings?: WindowSettings;

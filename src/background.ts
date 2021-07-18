@@ -6,10 +6,12 @@ import {
   BrowserWindow,
   ipcMain,
   nativeTheme,
-  clipboard
+  clipboard,
+  dialog
 } from 'electron';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
+import { exec, ExecException } from 'child_process';
 import path from 'path';
 import {
   getHistoryItems,
@@ -36,6 +38,7 @@ if (!gotTheLock) {
   app.quit();
 } else {
   app.on('second-instance', () => {
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     showOrCreateWindow('history');
   });
 }
@@ -98,7 +101,7 @@ async function createWindow(mode: 'history' | 'settings') {
     win.loadURL(`app://./index.html?${params}`);
   }
 
-  let _setWindowSettings = () => {
+  const _setWindowSettings = () => {
     setWindowSettings(mode, {
       ...(win.isMaximized()
         ? {
@@ -225,6 +228,24 @@ const sendToWebContents = () => {
   }
 };
 
+const copyTextAndExecCommand = (text: string) => {
+  clipboard.writeText(text);
+  const settings = getSettings();
+  if (settings.command) {
+    setTimeout(() => {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      exec(settings.command!, (error: ExecException | null) => {
+        if (error) {
+          dialog.showErrorBox(
+            'Command Error',
+            `The command [${settings.command}] failed.`
+          );
+        }
+      });
+    }, settings.commandTimeout || 200);
+  }
+};
+
 ipcMain
   .on('web-app-created', () => {
     sendToWebContents();
@@ -236,7 +257,7 @@ ipcMain
     }
   )
   .on('web-copy-click', (event, [text]: [string]) => {
-    clipboard.writeText(text);
+    copyTextAndExecCommand(text);
     if (getSettings().closeAfterCopy) {
       if (historyWin) {
         hideWindow('history');
@@ -244,7 +265,7 @@ ipcMain
     }
   })
   .on('web-enter-keydown', (event, [text]: [string]) => {
-    clipboard.writeText(text);
+    copyTextAndExecCommand(text);
     if (getSettings().closeAfterCopy) {
       if (historyWin) {
         hideWindow('history');

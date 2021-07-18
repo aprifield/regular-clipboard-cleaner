@@ -27,12 +27,11 @@ function startMonitoring() {
       : 60;
 
   return setInterval(() => {
-    let text = clipboard.readText();
+    const text = clipboard.readText();
     if (!text) {
       return;
     }
 
-    text = text.trim();
     const time = new Date().getTime();
 
     if (
@@ -70,7 +69,7 @@ export function restartMonitoring() {
 
 export function deleteHistory(removedText: string) {
   const clipboardText = clipboard.readText();
-  if (clipboardText && clipboardText.trim() === removedText) {
+  if (clipboardText && clipboardText === removedText) {
     clipboard.clear();
   }
 

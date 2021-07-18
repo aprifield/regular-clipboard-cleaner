@@ -6,7 +6,7 @@
           <v-list>
             <v-list-item>
               <v-switch
-                label="Starting the application at login"
+                label="Start the application at login"
                 :input-value="settings.startAtLogin"
                 @change="onClipboardSettingsChange({ startAtLogin: $event })"
               >
@@ -111,10 +111,33 @@
                 </v-row>
               </v-container>
             </v-list-item>
+            <v-divider class="pa-2"></v-divider>
+            <v-list-item>
+              <v-text-field
+                label="Command after copying"
+                placeholder=""
+                :value="settings.command"
+                @change="onClipboardSettingsChange({ command: $event })"
+              >
+              </v-text-field>
+            </v-list-item>
+            <v-list-item>
+              <v-text-field
+                label="Wait time before executing the command"
+                min="0"
+                max="10000"
+                type="number"
+                suffix="Milliseconds"
+                :value="settings.commandTimeout || 200"
+                @change="onClipboardSettingsChange({ commandTimeout: $event })"
+              >
+              </v-text-field>
+            </v-list-item>
           </v-list>
         </v-card-text>
-      </v-card> </v-container
-  ></v-layout>
+      </v-card>
+    </v-container>
+  </v-layout>
 </template>
 
 <script lang="ts">
@@ -149,4 +172,8 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.container {
+  max-width: 900px;
+}
+</style>
