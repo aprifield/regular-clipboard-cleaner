@@ -26,7 +26,9 @@ app.whenReady().then(() => {
     }
   ]);
 
-  tray = new Tray(nativeImage.createFromPath(path.join(__static, 'icon.png')));
+  tray = new Tray(
+    nativeImage.createFromPath(path.join(__static, 'icon-16x16.png'))
+  );
   tray.setContextMenu(contextMenu);
   tray.setToolTip(app.getName());
   tray.on('click', function() {
