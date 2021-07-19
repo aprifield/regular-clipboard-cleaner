@@ -52,18 +52,8 @@ protocol.registerSchemesAsPrivileged([
 ]);
 
 async function createWindow(mode: 'history' | 'settings') {
-  const windowSettings = {
-    position: [undefined, undefined],
-    size: [800, 600],
-    ...getWindowSettings(mode)
-  };
-
   // Create the browser window.
   const win = new BrowserWindow({
-    width: windowSettings.size[0],
-    height: windowSettings.size[1],
-    x: windowSettings.position[0],
-    y: windowSettings.position[1],
     icon: path.join(__static, 'icon.png'),
     show: false,
     webPreferences: {
@@ -75,12 +65,6 @@ async function createWindow(mode: 'history' | 'settings') {
       contextIsolation: true,
       preload: path.join(__dirname, 'preload.js')
     }
-  });
-  win.setBounds({
-    width: windowSettings.size[0],
-    height: windowSettings.size[1],
-    x: windowSettings.position[0],
-    y: windowSettings.position[1]
   });
   if (mode === 'settings') {
     settingsWin = win;
@@ -150,10 +134,10 @@ async function showOrCreateWindow(mode: 'history' | 'settings') {
     win.show();
     if (windowSettings && windowSettings.size && windowSettings.position) {
       win.setBounds({
-        width: windowSettings.size[0],
-        height: windowSettings.size[1],
-        x: windowSettings.position[0],
-        y: windowSettings.position[1]
+        width: windowSettings.size[0] || 800,
+        height: windowSettings.size[1] || 600,
+        x: windowSettings.position[0] || 0,
+        y: windowSettings.position[1] || 0
       });
     }
     win.setOpacity(1);
