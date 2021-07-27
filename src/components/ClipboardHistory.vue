@@ -16,49 +16,52 @@
           ></v-text-field>
         </v-card-title>
         <v-card-text>
-          <v-data-table
-            ref="dataTable"
-            :headers="[{ value: 'row' }, { value: 'text' }]"
-            :items="tableHistoryItems"
-            :custom-filter="customFilter"
-            disable-pagination
-            dense
-            hide-default-header
-            hide-default-footer
-            :mobile-breakpoint="0"
-            :search="search"
-            @current-items="onCurrentItemsChange"
-          >
-            <template v-slot:item="{ item, index }">
-              <tr :id="`clipboard-row-${index}`">
-                <td class="pr-0">
+          <v-list ref="historyList" dense>
+            <template v-for="(item, index) in currentHistoryItems">
+              <v-list-item
+                :key="`list-item-${index}`"
+                :id="`clipboard-row-${index}`"
+                class="v-list-item--link primary--text"
+              >
+                <v-list-item-icon class="mr-0">
                   {{ item.row }}
-                </td>
-                <td :style="{ 'white-space': 'nowrap' }">
-                  <div class="text-truncate clipboard-text">
-                    {{ item.text }}
-                  </div>
-                  <v-btn icon class="action-button" title="Copy to clipboard">
-                    <v-icon
-                      @click="
-                        () => {
-                          $emit('clipboard-copy-click', item.text);
-                          initStatus();
-                        }
-                      "
-                    >
-                      mdi-clipboard-outline
-                    </v-icon>
+                </v-list-item-icon>
+                <v-list-item-title>
+                  {{ item.text }}
+                </v-list-item-title>
+                <v-list-item-icon
+                  class="action-button"
+                  title="Copy to clipboard"
+                >
+                  <v-btn
+                    icon
+                    small
+                    @click="
+                      () => {
+                        $emit('clipboard-copy-click', item.text);
+                        initStatus();
+                      }
+                    "
+                  >
+                    <v-icon>mdi-clipboard-outline</v-icon>
                   </v-btn>
-                  <v-btn icon class="action-button" title="Delete">
-                    <v-icon @click="$emit('clipboard-delete-click', item.text)">
-                      mdi-trash-can-outline
-                    </v-icon>
+                </v-list-item-icon>
+                <v-list-item-icon class="action-button" title="Delete">
+                  <v-btn
+                    icon
+                    small
+                    @click="$emit('clipboard-delete-click', item.text)"
+                  >
+                    <v-icon>mdi-trash-can-outline</v-icon>
                   </v-btn>
-                </td>
-              </tr>
+                </v-list-item-icon>
+              </v-list-item>
+              <v-divider
+                v-if="index !== currentHistoryItems.length - 1"
+                :key="`divider-${index}`"
+              />
             </template>
-          </v-data-table>
+          </v-list>
         </v-card-text>
       </v-card>
     </v-container>
@@ -85,8 +88,7 @@ export default Vue.extend({
     return {
       search: '',
       isFocused: false,
-      selectedIndex: -1,
-      currentHistoryItems: [] as TableHistoryItems[]
+      selectedIndex: -1
     };
   },
 
@@ -94,6 +96,16 @@ export default Vue.extend({
     tableHistoryItems(): TableHistoryItems[] {
       return this.historyItems.map((item, index) => {
         return { ...item, index, row: index + 1 };
+      });
+    },
+    currentHistoryItems(): TableHistoryItems[] {
+      return this.tableHistoryItems.filter(item => {
+        return this.search
+          ? item.row + '' === this.search ||
+              item.text
+                .toLocaleLowerCase()
+                .includes(this.search.toLocaleLowerCase())
+          : true;
       });
     }
   },
@@ -105,21 +117,10 @@ export default Vue.extend({
           `#clipboard-row-${this.selectedIndex}`
         );
         if (selectedRow) {
-          selectedRow.classList.remove('active');
+          selectedRow.classList.remove('v-list-item--active');
         }
       }
       this.search = '';
-      this.selectedIndex = -1;
-    },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    customFilter(value: any, search: string | null, item: TableHistoryItems) {
-      return search
-        ? item.row + '' === search ||
-            item.text.toLocaleLowerCase().includes(search.toLocaleLowerCase())
-        : true;
-    },
-    onCurrentItemsChange(historyItems: TableHistoryItems[]) {
-      this.currentHistoryItems = historyItems;
       this.selectedIndex = -1;
     },
     onWindowKeyDown(event: KeyboardEvent) {
@@ -161,12 +162,12 @@ export default Vue.extend({
               `#clipboard-row-${prevIndex}`
             );
             if (prevRow) {
-              prevRow.classList.remove('active');
+              prevRow.classList.remove('v-list-item--active');
             }
           }
           const nextRow = document.querySelector(`#clipboard-row-${nextIndex}`);
           if (nextRow) {
-            nextRow.classList.add('active');
+            nextRow.classList.add('v-list-item--active');
             this.selectedIndex = nextIndex;
           }
         }
@@ -180,7 +181,7 @@ export default Vue.extend({
       oldHistoryItems: HistoryItem[]
     ) {
       if (oldHistoryItems.length < newHistoryItems.length) {
-        this.$vuetify.goTo(this.$refs.dataTable as Vue);
+        this.$vuetify.goTo(this.$refs.historyList as Vue);
       }
     }
   },
@@ -196,27 +197,18 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-.v-data-table {
-  ::v-deep .v-data-table__wrapper {
-    overflow-x: hidden;
+.v-list-item--link {
+  cursor: auto;
+  -webkit-user-select: auto;
+  -moz-user-select: auto;
+  -ms-user-select: auto;
+  user-select: auto;
+  .action-button {
+    display: none;
   }
-  tr {
-    .clipboard-text {
-      display: inline-block;
-      vertical-align: middle;
-      width: calc(100vw - 110px);
-    }
+  &:hover {
     .action-button {
-      visibility: hidden;
-    }
-    &:hover {
-      .clipboard-text {
-        padding-right: 10px;
-        width: calc(100vw - 180px);
-      }
-      .action-button {
-        visibility: visible;
-      }
+      display: inline-flex;
     }
   }
 }
