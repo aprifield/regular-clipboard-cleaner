@@ -76,11 +76,21 @@ export default Vue.extend({
   created() {
     const searchParams = new URL(window.location.href).searchParams;
     const mode = searchParams.get('mode') || 'history';
+    const platform = searchParams.get('platform');
     const shouldUseDarkColors =
       searchParams.get('shouldUseDarkColors') === 'true';
 
     this.$vuetify.theme.dark = shouldUseDarkColors;
     this.mode = mode;
+
+    if (platform === 'win32') {
+      const html = document.querySelector('html');
+      if (shouldUseDarkColors) {
+        html?.classList.add('webkit-scrollbar--dark');
+      } else {
+        html?.classList.add('webkit-scrollbar--light');
+      }
+    }
 
     this.ipcBridge.send('web-app-created');
     this.ipcBridge.on('init-history', (event, args) => {
@@ -102,5 +112,38 @@ export default Vue.extend({
 <style lang="scss">
 html {
   overflow: auto;
+}
+
+.webkit-scrollbar {
+  &--dark {
+    ::-webkit-scrollbar {
+      width: 12px;
+      height: 10px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgb(30, 30, 30);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgb(66, 66, 66);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(79, 79, 79);
+    }
+  }
+  &--light {
+    ::-webkit-scrollbar {
+      width: 12px;
+      height: 10px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgb(241, 241, 241);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgb(192, 192, 192);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(168, 168, 168);
+    }
+  }
 }
 </style>
