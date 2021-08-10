@@ -11,17 +11,25 @@
             hide-details
             label="Search (press /)"
             single-line
-            @focus="isFocused = true"
-            @blur="isFocused = false"
+            @focus="isTextFieldFocused = true"
+            @blur="isTextFieldFocused = false"
           ></v-text-field>
         </v-card-title>
-        <v-card-text>
-          <v-list ref="historyList" dense>
-            <template v-for="(item, index) in currentHistoryItems">
+        <v-card-text class="pa-0">
+          <v-virtual-scroll
+            ref="historyList"
+            bench="1"
+            :items="currentHistoryItems"
+            :height="historyContainerHeight"
+            :item-height="historyItemHeight"
+          >
+            <template v-slot:default="{ item, index }">
               <v-list-item
                 :key="`list-item-${index}`"
                 :id="`clipboard-row-${index}`"
                 class="v-list-item--link primary--text"
+                :class="{ 'v-list-item--active': index === selectedIndex }"
+                dense
               >
                 <v-list-item-icon class="mr-0">
                   {{ item.row }}
@@ -61,7 +69,7 @@
                 :key="`divider-${index}`"
               />
             </template>
-          </v-list>
+          </v-virtual-scroll>
         </v-card-text>
       </v-card>
     </v-container>
@@ -87,8 +95,11 @@ export default Vue.extend({
   data() {
     return {
       search: '',
-      isFocused: false,
-      selectedIndex: -1
+      isTextFieldFocused: false,
+      selectedIndex: -1,
+      findTargetTimeoutId: -1,
+      historyItemHeight: 40,
+      historyContainerHeight: 300
     };
   },
 
@@ -123,7 +134,57 @@ export default Vue.extend({
       this.search = '';
       this.selectedIndex = -1;
     },
-    onWindowKeyDown(event: KeyboardEvent) {
+    async adjustScrollPositionAndFindTargetRow(targetIndex: number) {
+      const maxVisibleItemCount = Math.floor(
+        this.historyContainerHeight / this.historyItemHeight
+      );
+
+      const offset =
+        this.historyItemHeight * (maxVisibleItemCount + 1) -
+        this.historyContainerHeight;
+
+      const visibleScrollRange = [
+        targetIndex < maxVisibleItemCount
+          ? 0
+          : (targetIndex - maxVisibleItemCount) * this.historyItemHeight +
+            offset,
+        targetIndex * this.historyItemHeight
+      ];
+
+      const scrollTop = (this.$refs.historyList as Vue).$el.scrollTop;
+
+      if (scrollTop < visibleScrollRange[0]) {
+        (this.$refs.historyList as Vue).$el.scrollTop = visibleScrollRange[0];
+      } else if (scrollTop > visibleScrollRange[1]) {
+        (this.$refs.historyList as Vue).$el.scrollTop = visibleScrollRange[1];
+      }
+
+      return new Promise((resolve: (targetRow: Element) => void, reject) => {
+        let retryCount = 0;
+        this.findTargetTimeoutId = window.setInterval(() => {
+          const targetRow = document.querySelector(
+            `#clipboard-row-${targetIndex}`
+          );
+          if (targetRow) {
+            clearInterval(this.findTargetTimeoutId);
+            this.findTargetTimeoutId = -1;
+            resolve(targetRow);
+            return;
+          }
+
+          if (10 < retryCount) {
+            clearInterval(this.findTargetTimeoutId);
+            this.findTargetTimeoutId = -1;
+            reject();
+            return;
+          }
+
+          retryCount++;
+          console.log('[ClipboardHistory] find target row failed.', retryCount);
+        });
+      });
+    },
+    async onWindowKeyDown(event: KeyboardEvent) {
       if (event.isComposing) {
         return;
       }
@@ -133,7 +194,7 @@ export default Vue.extend({
         this.$emit('clipboard-escape-keydown');
         this.search = '';
       } else if (event.code === 'Slash') {
-        if (!this.isFocused) {
+        if (!this.isTextFieldFocused) {
           event.preventDefault();
           (this.$refs.textField as Vue).$el.querySelector('input')?.focus();
         }
@@ -148,30 +209,49 @@ export default Vue.extend({
         }
       } else if (event.code === 'ArrowDown' || event.code === 'ArrowUp') {
         event.preventDefault();
-        if (this.isFocused) {
+        if (this.findTargetTimeoutId !== -1) {
+          return;
+        }
+
+        if (this.isTextFieldFocused) {
           (this.$refs.textField as Vue).$el.querySelector('input')?.blur();
         }
-        const prevIndex = this.selectedIndex;
-        const nextIndex =
+
+        const currentSelectedIndex = this.selectedIndex;
+        const targetSelectedIndex =
           event.code === 'ArrowDown'
             ? this.selectedIndex + 1
             : this.selectedIndex - 1;
-        if (this.currentHistoryItems[nextIndex]) {
-          if (this.currentHistoryItems[prevIndex]) {
-            const prevRow = document.querySelector(
-              `#clipboard-row-${prevIndex}`
+
+        if (this.currentHistoryItems[targetSelectedIndex]) {
+          if (this.currentHistoryItems[currentSelectedIndex]) {
+            const currentSelectedRow = document.querySelector(
+              `#clipboard-row-${currentSelectedIndex}`
             );
-            if (prevRow) {
-              prevRow.classList.remove('v-list-item--active');
+            if (currentSelectedRow) {
+              currentSelectedRow.classList.remove('v-list-item--active');
             }
           }
-          const nextRow = document.querySelector(`#clipboard-row-${nextIndex}`);
-          if (nextRow) {
-            nextRow.classList.add('v-list-item--active');
-            this.selectedIndex = nextIndex;
+
+          try {
+            const targetSelectedRow = await this.adjustScrollPositionAndFindTargetRow(
+              targetSelectedIndex
+            );
+            targetSelectedRow.classList.add('v-list-item--active');
+            this.selectedIndex = targetSelectedIndex;
+          } catch {
+            this.selectedIndex = -1;
           }
         }
       }
+    },
+    onWindowResize() {
+      const historyContainer = (this.$refs.historyList as Vue).$el.closest(
+        '.v-card__text'
+      );
+      this.historyContainerHeight = historyContainer
+        ? historyContainer.clientHeight
+        : 300;
     }
   },
 
@@ -180,23 +260,35 @@ export default Vue.extend({
       newHistoryItems: HistoryItem[],
       oldHistoryItems: HistoryItem[]
     ) {
-      if (oldHistoryItems.length < newHistoryItems.length) {
-        this.$vuetify.goTo(this.$refs.historyList as Vue);
+      if (oldHistoryItems.length <= newHistoryItems.length) {
+        (this.$refs.historyList as Vue).$el.classList.add(
+          'scroll-behavior-smooth'
+        );
+        (this.$refs.historyList as Vue).$el.scrollTop = 0;
+        (this.$refs.historyList as Vue).$el.classList.remove(
+          'scroll-behavior-smooth'
+        );
       }
     }
   },
 
   mounted() {
     window.addEventListener('keydown', this.onWindowKeyDown);
+    window.addEventListener('resize', this.onWindowResize);
+    this.onWindowResize();
   },
 
   destroyed() {
     window.removeEventListener('keydown', this.onWindowKeyDown);
+    window.removeEventListener('resize', this.onWindowResize);
   }
 });
 </script>
 
 <style scoped lang="scss">
+.v-card__text {
+  height: calc(100vh - 62px);
+}
 .v-list-item--link {
   cursor: auto;
   -webkit-user-select: auto;
@@ -211,5 +303,8 @@ export default Vue.extend({
       display: inline-flex;
     }
   }
+}
+.scroll-behavior-smooth {
+  scroll-behavior: smooth;
 }
 </style>
