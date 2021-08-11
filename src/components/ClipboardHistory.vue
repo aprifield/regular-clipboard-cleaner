@@ -1,79 +1,81 @@
 <template>
-  <v-layout fill-height>
-    <v-container fluid class="pa-0">
-      <v-card flat>
-        <v-card-title>
-          <v-text-field
-            ref="textField"
-            v-model="search"
-            append-icon="mdi-magnify"
-            dense
-            hide-details
-            label="Search (press /)"
-            single-line
-            @focus="isTextFieldFocused = true"
-            @blur="isTextFieldFocused = false"
-          ></v-text-field>
-        </v-card-title>
-        <v-card-text class="pa-0">
-          <v-virtual-scroll
-            ref="historyList"
-            bench="1"
-            :items="currentHistoryItems"
-            :height="historyContainerHeight"
-            :item-height="historyItemHeight"
-          >
-            <template v-slot:default="{ item, index }">
-              <v-list-item
-                :key="`list-item-${index}`"
-                :id="`clipboard-row-${index}`"
-                class="v-list-item--link primary--text"
-                :class="{ 'v-list-item--active': index === selectedIndex }"
-                dense
-              >
-                <v-list-item-icon class="mr-0">
+  <v-container fluid class="pa-0">
+    <v-card flat>
+      <v-card-title>
+        <v-text-field
+          ref="textField"
+          v-model="search"
+          append-icon="mdi-magnify"
+          dense
+          hide-details
+          label="Search (press /)"
+          single-line
+          @focus="isTextFieldFocused = true"
+          @blur="isTextFieldFocused = false"
+        ></v-text-field>
+      </v-card-title>
+      <v-card-text class="pa-0">
+        <v-virtual-scroll
+          ref="historyList"
+          bench="1"
+          :items="currentHistoryItems"
+          :height="historyContainerHeight"
+          :item-height="historyItemHeight"
+        >
+          <template v-slot:default="{ item, index }">
+            <v-list-item
+              :key="`list-item-${index}`"
+              :id="`clipboard-row-${index}`"
+              class="v-list-item--link primary--text"
+              :class="{ 'v-list-item--active': index === selectedIndex }"
+              dense
+            >
+              <v-list-item-icon class="mr-2">
+                <span
+                  class="text-right secondary--text"
+                  :style="{ 'min-width': '16px' }"
+                >
                   {{ item.row }}
-                </v-list-item-icon>
+                </span>
+              </v-list-item-icon>
+              <v-list-item-content>
                 <v-list-item-title>
                   {{ item.text }}
                 </v-list-item-title>
-                <v-list-item-icon
-                  class="action-button"
-                  title="Copy to clipboard"
+              </v-list-item-content>
+              <v-list-item-icon class="action-button" title="Copy to clipboard">
+                <v-btn
+                  icon
+                  small
+                  @click="
+                    () => {
+                      $emit('clipboard-copy-click', item.text);
+                      initStatus();
+                    }
+                  "
                 >
-                  <v-btn
-                    icon
-                    small
-                    @click="
-                      () => {
-                        $emit('clipboard-copy-click', item.text);
-                        initStatus();
-                      }
-                    "
-                  >
-                    <v-icon>mdi-clipboard-outline</v-icon>
-                  </v-btn>
-                </v-list-item-icon>
-                <v-list-item-icon class="action-button" title="Delete">
-                  <v-btn
-                    icon
-                    small
-                    @click="$emit('clipboard-delete-click', item.text)"
-                  >
-                    <v-icon>mdi-trash-can-outline</v-icon>
-                  </v-btn>
-                </v-list-item-icon>
-              </v-list-item>
-              <v-divider
-                v-if="index !== currentHistoryItems.length - 1"
-                :key="`divider-${index}`"
-              />
-            </template>
-          </v-virtual-scroll>
-        </v-card-text>
-      </v-card>
-    </v-container>
-  </v-layout>
+                  <v-icon>mdi-clipboard-outline</v-icon>
+                </v-btn>
+              </v-list-item-icon>
+              <v-list-item-icon class="action-button" title="Delete">
+                <v-btn
+                  icon
+                  small
+                  @click="$emit('clipboard-delete-click', item.text)"
+                >
+                  <v-icon>mdi-trash-can-outline</v-icon>
+                </v-btn>
+              </v-list-item-icon>
+            </v-list-item>
+            <v-divider
+              v-if="index !== currentHistoryItems.length - 1"
+              :key="`divider-${index}`"
+            />
+          </template>
+        </v-virtual-scroll>
+      </v-card-text>
+    </v-card>
+  </v-container>
 </template>
 
 <script lang="ts">
