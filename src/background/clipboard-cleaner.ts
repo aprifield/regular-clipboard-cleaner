@@ -4,8 +4,7 @@ import {
   getSettings,
   setHistoryItems
 } from '@/background/electron-store-helper';
-
-const MAX_LENGTH = 100;
+import rules from '@/util/rules';
 
 let timeoutId: NodeJS.Timeout;
 
@@ -13,18 +12,26 @@ function startMonitoring() {
   const historyItems = getHistoryItems();
   const settings = getSettings();
 
-  const monitorInterval =
-    settings.monitorInterval !== undefined &&
-    1 <= +settings.monitorInterval &&
-    +settings.monitorInterval <= Number.MAX_SAFE_INTEGER
-      ? +settings.monitorInterval
-      : 2;
-  const clearInterval =
-    settings.clearInterval !== undefined &&
-    1 <= +settings.clearInterval &&
-    +settings.clearInterval <= Number.MAX_SAFE_INTEGER
-      ? +settings.clearInterval
-      : 60;
+  const monitorInterval = rules.monitorInterval.rule(settings.monitorInterval)
+    ? Number(settings.monitorInterval)
+    : rules.monitorInterval.init;
+  const clearInterval = rules.clearInterval.rule(settings.clearInterval)
+    ? Number(settings.clearInterval)
+    : rules.clearInterval.init;
+  const maxHistoryCount = rules.maxHistoryCount.rule(settings.maxHistoryCount)
+    ? Number(settings.maxHistoryCount)
+    : rules.maxHistoryCount.init;
+
+  if (maxHistoryCount === 0) {
+    return setInterval(() => {
+      clipboard.clear();
+      if (historyItems.length !== 0) {
+        historyItems.length = 0;
+        setHistoryItems(historyItems);
+        ipcMain.emit('clipboard-history-change', historyItems);
+      }
+    }, clearInterval * 1000);
+  }
 
   return setInterval(() => {
     const text = clipboard.readText();
@@ -44,8 +51,8 @@ function startMonitoring() {
         historyItems.splice(index, 1);
       }
       historyItems.unshift({ text, time });
-      if (MAX_LENGTH < historyItems.length) {
-        historyItems.length = MAX_LENGTH;
+      if (maxHistoryCount < historyItems.length) {
+        historyItems.length = maxHistoryCount;
       }
       setHistoryItems(historyItems);
       ipcMain.emit('clipboard-history-change', historyItems);

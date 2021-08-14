@@ -4,6 +4,7 @@ export interface Settings {
   closeAfterCopy?: boolean;
   monitorInterval?: number;
   clearInterval?: number;
+  maxHistoryCount?: number;
   shortcut?: {
     commandOrControl?: boolean;
     alt?: boolean;

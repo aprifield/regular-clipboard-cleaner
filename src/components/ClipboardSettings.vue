@@ -42,12 +42,15 @@
           <v-row>
             <v-col cols="12" sm="6">
               <v-text-field
+                :disabled="+settings.maxHistoryCount === 0"
                 hide-details
                 label="Interval to monitor the clipboard"
-                min="1"
-                type="number"
+                :min="rules.monitorInterval.min"
+                :max="rules.monitorInterval.max"
+                :rules="[rules.monitorInterval.rule]"
                 suffix="Seconds"
-                :value="settings.monitorInterval || 2"
+                type="number"
+                :value="settings.monitorInterval || rules.monitorInterval.init"
                 @change="onClipboardSettingsChange({ monitorInterval: $event })"
               >
               </v-text-field>
@@ -56,11 +59,28 @@
               <v-text-field
                 hide-details
                 label="Interval to clear the clipboard"
-                min="10"
-                type="number"
+                :min="rules.clearInterval.min"
+                :max="rules.clearInterval.max"
+                :rules="[rules.clearInterval.rule]"
                 suffix="Seconds"
-                :value="settings.clearInterval || 60"
+                type="number"
+                :value="settings.clearInterval || rules.clearInterval.init"
                 @change="onClipboardSettingsChange({ clearInterval: $event })"
+              >
+              </v-text-field>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12" sm="6">
+              <v-text-field
+                hide-details
+                label="Number of history to be saved"
+                :min="rules.maxHistoryCount.min"
+                :max="rules.maxHistoryCount.max"
+                :rules="[rules.maxHistoryCount.rule]"
+                type="number"
+                :value="settings.maxHistoryCount || rules.maxHistoryCount.init"
+                @change="onClipboardSettingsChange({ maxHistoryCount: $event })"
               >
               </v-text-field>
             </v-col>
@@ -145,11 +165,12 @@
               <v-text-field
                 hide-details
                 label="Wait time before executing the command"
-                min="0"
-                max="10000"
-                type="number"
+                :min="rules.commandTimeout.min"
+                :max="rules.commandTimeout.max"
+                :rules="[rules.commandTimeout.rule]"
                 suffix="Milliseconds"
-                :value="settings.commandTimeout || 200"
+                type="number"
+                :value="settings.commandTimeout || rules.commandTimeout.init"
                 @change="onClipboardSettingsChange({ commandTimeout: $event })"
               >
               </v-text-field>
@@ -163,6 +184,7 @@
 
 <script lang="ts">
 import { Settings } from '@/types/settings';
+import rules from '@/util/rules';
 import Vue, { PropType } from 'vue';
 
 export default Vue.extend({
@@ -173,6 +195,9 @@ export default Vue.extend({
   },
 
   computed: {
+    rules() {
+      return rules;
+    },
     shortcut() {
       return this.settings.shortcut || {};
     },
