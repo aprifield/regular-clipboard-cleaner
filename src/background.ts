@@ -22,6 +22,7 @@ import {
 } from '@/background/electron-store-helper';
 import '@/background/app-tray-helper';
 import '@/background/app-menu-helper';
+import { setOpenAtLogin } from '@/background/app-login-helper';
 import { registerShortcut } from '@/background/global-shortcut-helper';
 import '@/background/clipboard-cleaner';
 import {
@@ -30,7 +31,6 @@ import {
   restartMonitoring
 } from '@/background/clipboard-cleaner';
 import { Settings } from '@/types/settings';
-import { setOpenAtLogin } from './background/app-login-helper';
 const isDevelopment = process.env.NODE_ENV !== 'production';
 const gotTheLock = app.requestSingleInstanceLock();
 

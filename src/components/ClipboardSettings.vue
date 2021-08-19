@@ -42,6 +42,20 @@
           <v-row>
             <v-col cols="12" sm="6">
               <v-text-field
+                hide-details
+                label="Interval to clear the clipboard"
+                :min="rules.clearInterval.min"
+                :max="rules.clearInterval.max"
+                :rules="[rules.clearInterval.rule]"
+                suffix="Seconds"
+                type="number"
+                :value="settings.clearInterval || rules.clearInterval.init"
+                @change="onClipboardSettingsChange({ clearInterval: $event })"
+              >
+              </v-text-field>
+            </v-col>
+            <v-col cols="12" sm="6">
+              <v-text-field
                 :disabled="+settings.maxHistoryCount === 0"
                 hide-details
                 label="Interval to monitor the clipboard"
@@ -52,20 +66,6 @@
                 type="number"
                 :value="settings.monitorInterval || rules.monitorInterval.init"
                 @change="onClipboardSettingsChange({ monitorInterval: $event })"
-              >
-              </v-text-field>
-            </v-col>
-            <v-col cols="12" sm="6">
-              <v-text-field
-                hide-details
-                label="Interval to clear the clipboard"
-                :min="rules.clearInterval.min"
-                :max="rules.clearInterval.max"
-                :rules="[rules.clearInterval.rule]"
-                suffix="Seconds"
-                type="number"
-                :value="settings.clearInterval || rules.clearInterval.init"
-                @change="onClipboardSettingsChange({ clearInterval: $event })"
               >
               </v-text-field>
             </v-col>
