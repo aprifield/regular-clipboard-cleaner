@@ -279,9 +279,6 @@ ipcMain
     deleteAllHistory();
     sendToWebContents();
   })
-  .on('app-tray-icon-click', () => {
-    showOrCreateWindow('history');
-  })
   .on('app-tray-history-click', () => {
     showOrCreateWindow('history');
   })

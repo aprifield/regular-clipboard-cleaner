@@ -2,7 +2,7 @@ import { app, Menu, Tray, nativeImage, ipcMain } from 'electron';
 import path from 'path';
 
 // https://www.electronjs.org/docs/faq#my-apps-tray-disappeared-after-a-few-minutes
-let tray = null;
+let tray: Tray | null = null;
 
 app.whenReady().then(() => {
   const contextMenu = Menu.buildFromTemplate([
@@ -31,7 +31,9 @@ app.whenReady().then(() => {
   );
   tray.setContextMenu(contextMenu);
   tray.setToolTip(app.getName());
-  tray.on('click', function() {
-    ipcMain.emit('app-tray-icon-click');
+  tray.on('click', () => {
+    if (tray) {
+      tray.popUpContextMenu();
+    }
   });
 });
