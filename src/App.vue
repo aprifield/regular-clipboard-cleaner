@@ -3,6 +3,7 @@
     <v-main>
       <ClipboardSettings
         v-if="mode === 'settings'"
+        :platform="platform"
         :settings="settings"
         @clipboard-settings-change="onClipboardSettingsChange"
       />
@@ -33,6 +34,7 @@ export default Vue.extend({
   data() {
     return {
       mode: 'history',
+      platform: 'win32',
       historyItems: [] as HistoryItem[],
       settings: {} as Settings
     };
@@ -76,12 +78,13 @@ export default Vue.extend({
   created() {
     const searchParams = new URL(window.location.href).searchParams;
     const mode = searchParams.get('mode') || 'history';
-    const platform = searchParams.get('platform');
+    const platform = searchParams.get('platform') || 'win32';
     const shouldUseDarkColors =
       searchParams.get('shouldUseDarkColors') === 'true';
 
     this.$vuetify.theme.dark = shouldUseDarkColors;
     this.mode = mode;
+    this.platform = platform;
 
     if (platform === 'win32') {
       const html = document.querySelector('html');

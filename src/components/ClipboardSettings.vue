@@ -50,7 +50,7 @@
                 suffix="Seconds"
                 type="number"
                 :value="settings.clearInterval || rules.clearInterval.init"
-                @change="onClipboardSettingsChange({ clearInterval: $event })"
+                @change="onClipboardSettingsChange({ clearInterval: +$event })"
               >
               </v-text-field>
             </v-col>
@@ -65,7 +65,9 @@
                 suffix="Seconds"
                 type="number"
                 :value="settings.monitorInterval || rules.monitorInterval.init"
-                @change="onClipboardSettingsChange({ monitorInterval: $event })"
+                @change="
+                  onClipboardSettingsChange({ monitorInterval: +$event })
+                "
               >
               </v-text-field>
             </v-col>
@@ -80,7 +82,9 @@
                 :rules="[rules.maxHistoryCount.rule]"
                 type="number"
                 :value="settings.maxHistoryCount || rules.maxHistoryCount.init"
-                @change="onClipboardSettingsChange({ maxHistoryCount: $event })"
+                @change="
+                  onClipboardSettingsChange({ maxHistoryCount: +$event })
+                "
               >
               </v-text-field>
             </v-col>
@@ -171,9 +175,32 @@
                 suffix="Milliseconds"
                 type="number"
                 :value="settings.commandTimeout || rules.commandTimeout.init"
-                @change="onClipboardSettingsChange({ commandTimeout: $event })"
+                @change="onClipboardSettingsChange({ commandTimeout: +$event })"
               >
               </v-text-field>
+            </v-col>
+          </v-row>
+        </v-container>
+        <v-divider class="my-2"></v-divider>
+        <v-container>
+          <v-row>
+            <v-col>
+              <v-switch
+                v-if="platform == 'darwin'"
+                hide-details
+                label="Hide the icon from the Dock"
+                :input-value="settings.hideDockIcon"
+                @change="onClipboardSettingsChange({ hideDockIcon: $event })"
+              >
+              </v-switch>
+              <v-switch
+                v-else
+                hide-details
+                label="Hide the icon from the taskbar"
+                :input-value="settings.hideTaskbarIcon"
+                @change="onClipboardSettingsChange({ hideTaskbarIcon: $event })"
+              >
+              </v-switch>
             </v-col>
           </v-row>
         </v-container>
@@ -191,7 +218,8 @@ export default Vue.extend({
   name: 'ClipboardSettings',
 
   props: {
-    settings: { type: Object as PropType<Settings>, required: true }
+    settings: { type: Object as PropType<Settings>, required: true },
+    platform: { type: String, required: true }
   },
 
   computed: {

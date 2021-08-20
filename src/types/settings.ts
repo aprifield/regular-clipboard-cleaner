@@ -5,6 +5,8 @@ export interface Settings {
   monitorInterval?: number;
   clearInterval?: number;
   maxHistoryCount?: number;
+  hideTaskbarIcon?: boolean;
+  hideDockIcon?: boolean;
   shortcut?: {
     commandOrControl?: boolean;
     alt?: boolean;

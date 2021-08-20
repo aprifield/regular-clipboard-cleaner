@@ -23,6 +23,8 @@ import {
 import '@/background/app-tray-helper';
 import '@/background/app-menu-helper';
 import { setOpenAtLogin } from '@/background/app-login-helper';
+import { switchTaskbarIcon } from '@/background/app-taskbar-helper';
+import { switchDockIcon } from '@/background/app-dock-helper';
 import { registerShortcut } from '@/background/global-shortcut-helper';
 import '@/background/clipboard-cleaner';
 import {
@@ -52,10 +54,12 @@ protocol.registerSchemesAsPrivileged([
 ]);
 
 async function createWindow(mode: 'history' | 'settings') {
+  const settings = getSettings();
   // Create the browser window.
   const win = new BrowserWindow({
     icon: path.join(__static, 'icon.png'),
     show: false,
+    skipTaskbar: mode === 'history' && settings.hideTaskbarIcon,
     webPreferences: {
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
@@ -270,6 +274,8 @@ ipcMain
     restartMonitoring();
     registerShortcut();
     setOpenAtLogin();
+    switchTaskbarIcon(historyWin);
+    switchDockIcon();
     sendToWebContents();
   })
   .on('app-menu-settings-click', () => {
