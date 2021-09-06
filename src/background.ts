@@ -13,6 +13,7 @@ import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
 import { exec, ExecException } from 'child_process';
 import path from 'path';
+import robot from 'robotjs';
 import {
   getHistoryItems,
   getSettings,
@@ -219,18 +220,23 @@ const sendToWebContents = () => {
 const copyTextAndExecCommand = (text: string) => {
   clipboard.writeText(text);
   const settings = getSettings();
-  if (settings.command) {
+  if (settings.pasteAfterCopy) {
+    setTimeout(() => {
+      robot.keyTap('v', 'control');
+    }, settings.pasteAfterCopyTimeout || 200);
+  }
+  if (settings.commandAfterCopy) {
     setTimeout(() => {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      exec(settings.command!, (error: ExecException | null) => {
+      exec(settings.commandAfterCopy!, (error: ExecException | null) => {
         if (error) {
           dialog.showErrorBox(
             'Command Error',
-            `The command [${settings.command}] failed.`
+            `The command [${settings.commandAfterCopy}] failed.`
           );
         }
       });
-    }, settings.commandTimeout || 200);
+    }, settings.commandAfterCopyTimeout || 200);
   }
 };
 

@@ -3,7 +3,7 @@
     <v-card flat>
       <v-card-text>
         <v-container>
-          <v-row>
+          <v-row align="center">
             <v-col>
               <v-switch
                 hide-details
@@ -14,7 +14,7 @@
               </v-switch>
             </v-col>
           </v-row>
-          <v-row>
+          <v-row align="center">
             <v-col>
               <v-switch
                 hide-details
@@ -25,7 +25,7 @@
               </v-switch>
             </v-col>
           </v-row>
-          <v-row>
+          <v-row align="center">
             <v-col>
               <v-switch
                 hide-details
@@ -39,7 +39,7 @@
         </v-container>
         <v-divider class="my-2"></v-divider>
         <v-container>
-          <v-row>
+          <v-row align="center">
             <v-col cols="12" sm="6">
               <v-text-field
                 hide-details
@@ -72,7 +72,7 @@
               </v-text-field>
             </v-col>
           </v-row>
-          <v-row>
+          <v-row align="center">
             <v-col cols="12" sm="6">
               <v-text-field
                 hide-details
@@ -92,7 +92,7 @@
         </v-container>
         <v-divider class="my-2"></v-divider>
         <v-container>
-          <v-row>
+          <v-row align="center">
             <v-col>Shortcut for displaying the clipboard history</v-col>
           </v-row>
           <v-row align="center">
@@ -152,30 +152,67 @@
         </v-container>
         <v-divider class="my-2"></v-divider>
         <v-container>
-          <v-row>
-            <v-col cols="12">
+          <v-row align="center">
+            <v-col cols="12" sm="6">
+              <v-switch
+                hide-details
+                label="Paste after copying"
+                :input-value="settings.pasteAfterCopy"
+                @change="onClipboardSettingsChange({ pasteAfterCopy: $event })"
+              >
+              </v-switch>
+              <span class="text-caption">(Does not work on mac)</span>
+            </v-col>
+            <v-col cols="12" sm="6">
               <v-text-field
                 hide-details
-                label="Command after copying"
-                placeholder=""
-                :value="settings.command"
-                @change="onClipboardSettingsChange({ command: $event })"
+                label="Wait time before pasting"
+                :min="rules.pasteAfterCopyTimeout.min"
+                :max="rules.pasteAfterCopyTimeout.max"
+                :rules="[rules.pasteAfterCopyTimeout.rule]"
+                suffix="Milliseconds"
+                type="number"
+                :value="
+                  settings.pasteAfterCopyTimeout ||
+                    rules.pasteAfterCopyTimeout.init
+                "
+                @change="
+                  onClipboardSettingsChange({ pasteAfterCopyTimeout: +$event })
+                "
               >
               </v-text-field>
             </v-col>
           </v-row>
-          <v-row>
+          <v-row align="center">
+            <v-col cols="12" sm="6">
+              <v-text-field
+                hide-details
+                label="Command after copying"
+                :value="settings.commandAfterCopy"
+                @change="
+                  onClipboardSettingsChange({ commandAfterCopy: $event })
+                "
+              >
+              </v-text-field>
+            </v-col>
             <v-col cols="12" sm="6">
               <v-text-field
                 hide-details
                 label="Wait time before executing the command"
-                :min="rules.commandTimeout.min"
-                :max="rules.commandTimeout.max"
-                :rules="[rules.commandTimeout.rule]"
+                :min="rules.commandAfterCopyTimeout.min"
+                :max="rules.commandAfterCopyTimeout.max"
+                :rules="[rules.commandAfterCopyTimeout.rule]"
                 suffix="Milliseconds"
                 type="number"
-                :value="settings.commandTimeout || rules.commandTimeout.init"
-                @change="onClipboardSettingsChange({ commandTimeout: +$event })"
+                :value="
+                  settings.commandAfterCopyTimeout ||
+                    rules.commandAfterCopyTimeout.init
+                "
+                @change="
+                  onClipboardSettingsChange({
+                    commandAfterCopyTimeout: +$event
+                  })
+                "
               >
               </v-text-field>
             </v-col>
@@ -183,7 +220,7 @@
         </v-container>
         <v-divider class="my-2"></v-divider>
         <v-container>
-          <v-row>
+          <v-row align="center">
             <v-col>
               <v-switch
                 v-if="platform == 'darwin'"

@@ -13,8 +13,10 @@ export interface Settings {
     shift?: boolean;
     key?: string;
   };
-  command?: string;
-  commandTimeout?: number;
+  pasteAfterCopy?: boolean;
+  pasteAfterCopyTimeout?: number;
+  commandAfterCopy?: string;
+  commandAfterCopyTimeout?: number;
   window?: {
     history?: WindowSettings;
     settings?: WindowSettings;
