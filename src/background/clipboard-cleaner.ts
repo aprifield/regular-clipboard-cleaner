@@ -22,51 +22,69 @@ function startMonitoring() {
     ? Number(settings.maxHistoryCount)
     : rules.maxHistoryCount.init;
 
+  let lastClearedTime = new Date().getTime();
+  let clearClipboard = () => {
+    console.log('[clipboard-cleaner] clear');
+    clipboard.clear();
+    lastClearedTime = new Date().getTime();
+  };
+
   if (maxHistoryCount === 0) {
     return setInterval(() => {
-      clipboard.clear();
+      clearClipboard();
       if (historyItems.length !== 0) {
         historyItems.length = 0;
         setHistoryItems(historyItems);
         ipcMain.emit('clipboard-history-change', historyItems);
       }
     }, clearInterval * 1000);
-  }
-
-  return setInterval(() => {
-    const text = clipboard.readText();
-    if (!text) {
-      return;
-    }
-
-    const time = new Date().getTime();
-
-    if (
-      !historyItems[0] ||
-      (historyItems[0] &&
-        (historyItems[0].text !== text || historyItems[0].cleared))
-    ) {
-      const index = historyItems.findIndex(item => item.text === text);
-      if (0 <= index) {
-        historyItems.splice(index, 1);
+  } else {
+    return setInterval(() => {
+      const time = new Date().getTime();
+      const text = clipboard.readText();
+      if (!text) {
+        const diff = time - lastClearedTime;
+        console.log('[clipboard-cleaner] diff', diff / 1000);
+        if (clearInterval * 1000 <= diff) {
+          clearClipboard();
+        }
+        return;
       }
-      historyItems.unshift({ text, time });
-      if (maxHistoryCount < historyItems.length) {
-        historyItems.length = maxHistoryCount;
-      }
-      setHistoryItems(historyItems);
-      ipcMain.emit('clipboard-history-change', historyItems);
-    }
-    if (historyItems[0] && historyItems[0].text === text) {
-      const diff = time - historyItems[0].time;
-      console.log('[clipboard-cleaner] diff', diff / 1000);
-      if (clearInterval * 1000 <= diff) {
-        clipboard.clear();
-        historyItems[0].cleared = true;
+
+      if (
+        !historyItems[0] ||
+        historyItems[0].cleared ||
+        historyItems[0].text !== text
+      ) {
+        if (!historyItems[0]) {
+          historyItems.unshift({ text, time });
+        } else if (historyItems[0].cleared) {
+          historyItems[0] = { text, time };
+        } else if (historyItems[0].text !== text) {
+          const index = historyItems.findIndex(item => item.text === text);
+          if (0 <= index) {
+            historyItems.splice(index, 1);
+          }
+          historyItems.unshift({ text, time });
+          if (maxHistoryCount < historyItems.length) {
+            historyItems.length = maxHistoryCount;
+          }
+        }
         setHistoryItems(historyItems);
+        ipcMain.emit('clipboard-history-change', historyItems);
+      } else {
+        if (historyItems[0].text === text) {
+          const diff = time - historyItems[0].time;
+          console.log('[clipboard-cleaner] diff', diff / 1000);
+          if (clearInterval * 1000 <= diff) {
+            clearClipboard();
+            historyItems[0].cleared = true;
+            setHistoryItems(historyItems);
+          }
+        }
       }
-    }
-  }, monitorInterval * 1000);
+    }, monitorInterval * 1000);
+  }
 }
 
 export function restartMonitoring() {
