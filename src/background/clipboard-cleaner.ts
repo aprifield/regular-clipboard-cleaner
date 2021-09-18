@@ -12,18 +12,13 @@ function startMonitoring() {
   const historyItems = getHistoryItems();
   const settings = getSettings();
 
-  const monitorInterval = rules.monitorInterval.rule(settings.monitorInterval)
-    ? Number(settings.monitorInterval)
-    : rules.monitorInterval.init;
-  const clearInterval = rules.clearInterval.rule(settings.clearInterval)
-    ? Number(settings.clearInterval)
-    : rules.clearInterval.init;
-  const maxHistoryCount = rules.maxHistoryCount.rule(settings.maxHistoryCount)
-    ? Number(settings.maxHistoryCount)
-    : rules.maxHistoryCount.init;
+  const monitorInterval = rules.monitorInterval.value(settings.monitorInterval);
+  const clearInterval = rules.clearInterval.value(settings.clearInterval);
+  const maxHistoryCount = rules.maxHistoryCount.value(settings.maxHistoryCount);
 
   let lastClearedTime = new Date().getTime();
-  let clearClipboard = () => {
+
+  const clearClipboard = () => {
     console.log('[clipboard-cleaner] clear');
     clipboard.clear();
     lastClearedTime = new Date().getTime();

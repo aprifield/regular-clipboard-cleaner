@@ -49,7 +49,7 @@
                 :rules="[rules.clearInterval.rule]"
                 suffix="Seconds"
                 type="number"
-                :value="settings.clearInterval || rules.clearInterval.init"
+                :value="rules.clearInterval.value(settings.clearInterval)"
                 @change="onClipboardSettingsChange({ clearInterval: +$event })"
               >
               </v-text-field>
@@ -64,7 +64,7 @@
                 :rules="[rules.monitorInterval.rule]"
                 suffix="Seconds"
                 type="number"
-                :value="settings.monitorInterval || rules.monitorInterval.init"
+                :value="rules.monitorInterval.value(settings.monitorInterval)"
                 @change="
                   onClipboardSettingsChange({ monitorInterval: +$event })
                 "
@@ -81,7 +81,7 @@
                 :max="rules.maxHistoryCount.max"
                 :rules="[rules.maxHistoryCount.rule]"
                 type="number"
-                :value="settings.maxHistoryCount || rules.maxHistoryCount.init"
+                :value="rules.maxHistoryCount.value(settings.maxHistoryCount)"
                 @change="
                   onClipboardSettingsChange({ maxHistoryCount: +$event })
                 "
@@ -173,8 +173,9 @@
                 suffix="Milliseconds"
                 type="number"
                 :value="
-                  settings.pasteAfterCopyTimeout ||
-                    rules.pasteAfterCopyTimeout.init
+                  rules.pasteAfterCopyTimeout.value(
+                    settings.pasteAfterCopyTimeout
+                  )
                 "
                 @change="
                   onClipboardSettingsChange({ pasteAfterCopyTimeout: +$event })
@@ -205,8 +206,9 @@
                 suffix="Milliseconds"
                 type="number"
                 :value="
-                  settings.commandAfterCopyTimeout ||
-                    rules.commandAfterCopyTimeout.init
+                  rules.commandAfterCopyTimeout.value(
+                    settings.commandAfterCopyTimeout
+                  )
                 "
                 @change="
                   onClipboardSettingsChange({
