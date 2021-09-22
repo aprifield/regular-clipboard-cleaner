@@ -1,25 +1,28 @@
 import { app, Menu, Tray, nativeImage, ipcMain } from 'electron';
 import path from 'path';
+import { loadDictionary, translate as __ } from '@/util/i18n';
 
 // https://www.electronjs.org/docs/faq#my-apps-tray-disappeared-after-a-few-minutes
 let tray: Tray | null = null;
 
 app.whenReady().then(() => {
+  loadDictionary(app.getLocale());
+
   const contextMenu = Menu.buildFromTemplate([
     {
-      label: 'History',
+      label: __('tray.clipboardHistory'),
       click: () => {
         ipcMain.emit('app-tray-history-click');
       }
     },
     {
-      label: 'Settings',
+      label: __('tray.settings'),
       click: () => {
         ipcMain.emit('app-tray-settings-click');
       }
     },
     {
-      label: 'Exit',
+      label: __('tray.exit'),
       click: () => {
         ipcMain.emit('app-tray-exit-click');
       }

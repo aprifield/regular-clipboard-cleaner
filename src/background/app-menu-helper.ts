@@ -5,10 +5,13 @@ import {
   MenuItemConstructorOptions,
   shell
 } from 'electron';
+import { loadDictionary, translate as __ } from '@/util/i18n';
 
 // https://www.electronjs.org/docs/api/menu
 
 app.whenReady().then(() => {
+  loadDictionary(app.getLocale());
+
   const isMac = process.platform === 'darwin';
 
   const template = [
@@ -17,75 +20,80 @@ app.whenReady().then(() => {
           {
             label: app.name,
             submenu: [
-              { role: 'about' },
+              { role: 'about', label: __('menu.about', app.getName()) },
               { type: 'separator' },
               {
-                label: 'Settings',
+                label: __('menu.settings'),
                 click: () => {
                   ipcMain.emit('app-menu-settings-click');
                 }
               },
               { type: 'separator' },
-              { role: 'services' },
+              { role: 'services', label: __('menu.services') },
               { type: 'separator' },
-              { role: 'hide' },
-              { role: 'hideothers' },
-              { role: 'unhide' },
+              { role: 'hide', label: __('menu.hide', app.getName()) },
+              { role: 'hideothers', label: __('menu.hideothers') },
+              { role: 'unhide', label: __('menu.unhide') },
               { type: 'separator' },
-              { role: 'quit' }
+              { role: 'quit', label: __('menu.quitForMac', app.getName()) }
             ]
           }
         ]
       : []),
     {
       role: 'fileMenu',
+      label: __('menu.fileMenu'),
       submenu: isMac
-        ? [{ role: 'close' }]
+        ? [{ role: 'close', label: __('menu.close') }]
         : [
             {
-              label: 'Settings',
+              label: __('menu.settings'),
               click: () => ipcMain.emit('app-menu-settings-click')
             },
             { type: 'separator' },
-            { role: 'quit' }
+            { role: 'quit', label: __('menu.quit') }
           ]
     },
     {
       role: 'editMenu',
+      label: __('menu.editMenu'),
       submenu: [
         {
-          label: 'Delete All History',
+          label: __('menu.deleteAllHistory'),
           click: () => ipcMain.emit('app-menu-delete-all-history-click')
         }
       ]
     },
     {
       role: 'viewMenu',
+      label: __('menu.viewMenu'),
       submenu: [
-        { role: 'reload' },
-        { role: 'forceReload' },
+        { role: 'reload', label: __('menu.reload') },
+        { role: 'forceReload', label: __('menu.forceReload') },
         { type: 'separator' },
-        { role: 'resetZoom' },
-        { role: 'zoomIn' },
-        { role: 'zoomOut' },
+        { role: 'resetZoom', label: __('menu.resetZoom') },
+        { role: 'zoomIn', label: __('menu.zoomIn') },
+        { role: 'zoomOut', label: __('menu.zoomOut') },
         { type: 'separator' },
-        { role: 'togglefullscreen' }
+        { role: 'togglefullscreen', label: __('menu.togglefullscreen') }
       ]
     },
     {
       role: 'windowMenu',
+      label: __('menu.windowMenu'),
       submenu: [
-        { role: 'minimize' },
+        { role: 'minimize', label: __('menu.minimize') },
         ...(isMac //
-          ? [{ role: 'zoom' }]
-          : [{ role: 'close' }])
+          ? [{ role: 'zoom', label: __('menu.zoom') }]
+          : [{ role: 'close', label: __('menu.close') }])
       ]
     },
     {
       role: 'help',
+      label: __('menu.help'),
       submenu: [
         {
-          label: 'Learn More',
+          label: __('menu.learnMore'),
           click: async () => {
             await shell.openExternal(
               'https://github.com/aprifield/regular-clipboard-cleaner'

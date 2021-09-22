@@ -7,7 +7,7 @@
             <v-col>
               <v-switch
                 hide-details
-                label="Start the application at login"
+                :label="__('settings.startAtLogin')"
                 :input-value="settings.startAtLogin"
                 @change="onClipboardSettingsChange({ startAtLogin: $event })"
               >
@@ -18,7 +18,7 @@
             <v-col>
               <v-switch
                 hide-details
-                label="Maintain the history even after restarting the application"
+                :label="__('settings.maintained')"
                 :input-value="settings.maintained"
                 @change="onClipboardSettingsChange({ maintained: $event })"
               >
@@ -29,7 +29,7 @@
             <v-col>
               <v-switch
                 hide-details
-                label="Close the history window after copying"
+                :label="__('settings.closeAfterCopy')"
                 :input-value="settings.closeAfterCopy"
                 @change="onClipboardSettingsChange({ closeAfterCopy: $event })"
               >
@@ -43,11 +43,11 @@
             <v-col cols="12" sm="6">
               <v-text-field
                 hide-details
-                label="Interval to clear the clipboard"
+                :label="__('settings.clearInterval')"
                 :min="rules.clearInterval.min"
                 :max="rules.clearInterval.max"
                 :rules="[rules.clearInterval.rule]"
-                suffix="Seconds"
+                :suffix="__('settings.seconds')"
                 type="number"
                 :value="rules.clearInterval.value(settings.clearInterval)"
                 @change="onClipboardSettingsChange({ clearInterval: +$event })"
@@ -58,11 +58,11 @@
               <v-text-field
                 :disabled="+settings.maxHistoryCount === 0"
                 hide-details
-                label="Interval to monitor the clipboard"
+                :label="__('settings.monitorInterval')"
                 :min="rules.monitorInterval.min"
                 :max="rules.monitorInterval.max"
                 :rules="[rules.monitorInterval.rule]"
-                suffix="Seconds"
+                :suffix="__('settings.seconds')"
                 type="number"
                 :value="rules.monitorInterval.value(settings.monitorInterval)"
                 @change="
@@ -76,7 +76,7 @@
             <v-col cols="12" sm="6">
               <v-text-field
                 hide-details
-                label="Number of history to be saved"
+                :label="__('settings.maxHistoryCount')"
                 :min="rules.maxHistoryCount.min"
                 :max="rules.maxHistoryCount.max"
                 :rules="[rules.maxHistoryCount.rule]"
@@ -93,7 +93,7 @@
         <v-divider class="my-2"></v-divider>
         <v-container>
           <v-row align="center">
-            <v-col>Shortcut for displaying the clipboard history</v-col>
+            <v-col>{{ __('settings.shortcutComment') }}</v-col>
           </v-row>
           <v-row align="center">
             <v-col cols="12" sm="3">
@@ -156,21 +156,23 @@
             <v-col cols="12" sm="6">
               <v-switch
                 hide-details
-                label="Paste after copying"
+                :label="__('settings.pasteAfterCopy')"
                 :input-value="settings.pasteAfterCopy"
                 @change="onClipboardSettingsChange({ pasteAfterCopy: $event })"
               >
               </v-switch>
-              <span class="text-caption">(Does not work on mac)</span>
+              <span class="text-caption">
+                ({{ __('settings.pasteAfterCopyComment') }})
+              </span>
             </v-col>
             <v-col cols="12" sm="6">
               <v-text-field
                 hide-details
-                label="Wait time before pasting"
+                :label="__('settings.pasteAfterCopyTimeout')"
                 :min="rules.pasteAfterCopyTimeout.min"
                 :max="rules.pasteAfterCopyTimeout.max"
                 :rules="[rules.pasteAfterCopyTimeout.rule]"
-                suffix="Milliseconds"
+                :suffix="__('settings.milliseconds')"
                 type="number"
                 :value="
                   rules.pasteAfterCopyTimeout.value(
@@ -188,7 +190,7 @@
             <v-col cols="12" sm="6">
               <v-text-field
                 hide-details
-                label="Command after copying"
+                :label="__('settings.commandAfterCopy')"
                 :value="settings.commandAfterCopy"
                 @change="
                   onClipboardSettingsChange({ commandAfterCopy: $event })
@@ -199,11 +201,11 @@
             <v-col cols="12" sm="6">
               <v-text-field
                 hide-details
-                label="Wait time before executing the command"
+                :label="__('settings.commandAfterCopyTimeout')"
                 :min="rules.commandAfterCopyTimeout.min"
                 :max="rules.commandAfterCopyTimeout.max"
                 :rules="[rules.commandAfterCopyTimeout.rule]"
-                suffix="Milliseconds"
+                :suffix="__('settings.milliseconds')"
                 type="number"
                 :value="
                   rules.commandAfterCopyTimeout.value(
@@ -227,7 +229,7 @@
               <v-switch
                 v-if="platform == 'darwin'"
                 hide-details
-                label="Hide the icon from the Dock"
+                :label="__('settings.hideDockIcon')"
                 :input-value="settings.hideDockIcon"
                 @change="onClipboardSettingsChange({ hideDockIcon: $event })"
               >
@@ -235,7 +237,7 @@
               <v-switch
                 v-else
                 hide-details
-                label="Hide the icon from the taskbar"
+                :label="__('settings.hideTaskbarIcon')"
                 :input-value="settings.hideTaskbarIcon"
                 @change="onClipboardSettingsChange({ hideTaskbarIcon: $event })"
               >
@@ -250,6 +252,7 @@
 
 <script lang="ts">
 import { Settings } from '@/types/settings';
+import { loadDictionary, translate as __ } from '@/util/i18n';
 import rules from '@/util/rules';
 import Vue, { PropType } from 'vue';
 
@@ -257,11 +260,16 @@ export default Vue.extend({
   name: 'ClipboardSettings',
 
   props: {
-    settings: { type: Object as PropType<Settings>, required: true },
-    platform: { type: String, required: true }
+    locale: { type: String, required: true },
+    platform: { type: String, required: true },
+    settings: { type: Object as PropType<Settings>, required: true }
   },
 
   computed: {
+    __() {
+      loadDictionary(this.locale);
+      return __;
+    },
     rules() {
       return rules;
     },

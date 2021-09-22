@@ -77,7 +77,12 @@ async function createWindow(mode: 'history' | 'settings') {
     historyWin = win;
   }
 
-  const params = `mode=${mode}&platform=${process.platform}&shouldUseDarkColors=${nativeTheme.shouldUseDarkColors}`;
+  const params = [
+    `mode=${mode}`,
+    `locale=${app.getLocale()}`,
+    `platform=${process.platform}`,
+    `shouldUseDarkColors=${nativeTheme.shouldUseDarkColors}`
+  ].join('&');
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     await win.loadURL(
