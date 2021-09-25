@@ -150,7 +150,6 @@ async function showOrCreateWindow(mode: 'history' | 'settings') {
         y: windowSettings.position[1] || 0
       });
     }
-    win.setOpacity(1);
   } else {
     createWindow(mode);
   }
@@ -159,9 +158,11 @@ async function showOrCreateWindow(mode: 'history' | 'settings') {
 async function hideWindow(mode: 'history' | 'settings') {
   const win = mode === 'settings' ? settingsWin : historyWin;
   if (win) {
-    win.setOpacity(0);
+    win.setOpacity(0); // Disable minimization animation
     win.minimize();
-    win.hide();
+    setTimeout(() => {
+      win.setOpacity(1);
+    });
   }
 }
 
