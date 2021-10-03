@@ -1,7 +1,10 @@
+import { Rectangle } from 'electron';
+
 export interface Settings {
   startAtLogin?: boolean;
   maintained?: boolean;
   closeAfterCopy?: boolean;
+  showNearCursor?: boolean;
   monitorInterval?: number;
   clearInterval?: number;
   maxHistoryCount?: number;
@@ -17,14 +20,6 @@ export interface Settings {
   pasteAfterCopyTimeout?: number;
   commandAfterCopy?: string;
   commandAfterCopyTimeout?: number;
-  window?: {
-    history?: WindowSettings;
-    settings?: WindowSettings;
-  };
-}
-
-export interface WindowSettings {
-  position?: number[];
-  size?: number[];
-  maximized?: boolean;
+  historyBounds?: Rectangle;
+  settingsBounds?: Rectangle;
 }

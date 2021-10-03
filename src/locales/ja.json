@@ -31,6 +31,7 @@
   "settings.startAtLogin": "アプリケーションを自動起動する",
   "settings.maintained": "アプリケーションを再起動してもクリップボード履歴を維持する",
   "settings.closeAfterCopy": "コピー後にクリップボード履歴画面を閉じる",
+  "settings.showNearCursor": "マウスカーソルの近くにクリップボード履歴画面を表示する",
   "settings.clearInterval": "クリップボードのクリア間隔",
   "settings.monitorInterval": "クリップボードの監視間隔",
   "settings.maxHistoryCount": "クリップボード履歴を保存する件数",

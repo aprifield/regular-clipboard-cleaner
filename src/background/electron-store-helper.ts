@@ -1,5 +1,6 @@
+import { Rectangle } from 'electron';
 import { HistoryItem } from '@/types/history-item';
-import { Settings, WindowSettings } from '@/types/settings';
+import { Settings } from '@/types/settings';
 import Store from 'electron-store';
 
 const clipboardStore = new Store<{ clipboard: HistoryItem[] }>({
@@ -13,7 +14,7 @@ const settingsStore = new Store<{ settings: Settings }>({
   name: '.settings',
   fileExtension: '',
   encryptionKey: 'jbBsbiyUGNwtRc3rUbwBgrbPi3PUztqD',
-  defaults: { settings: {} }
+  defaults: { settings: { showNearCursor: true } }
 });
 
 console.log('[electron-store-helper] path', clipboardStore.path);
@@ -48,25 +49,17 @@ export function setSettings(settings: Settings) {
 }
 
 export function getWindowSettings(mode: 'history' | 'settings') {
-  const window = getSettings().window;
-  return window
-    ? window[mode === 'settings' ? 'settings' : 'history']
-    : undefined;
+  const settings = getSettings();
+  return mode === 'settings' ? settings.settingsBounds : settings.historyBounds;
 }
 
 export function setWindowSettings(
   mode: 'history' | 'settings',
-  windowSettings: WindowSettings
+  bounds: Rectangle
 ) {
   const settings: Settings = {
     ...getSettings(),
-    window: {
-      ...getSettings().window,
-      [mode === 'settings' ? 'settings' : 'history']: {
-        ...getWindowSettings(mode),
-        ...windowSettings
-      }
-    }
+    [mode === 'settings' ? 'settingsBounds' : 'historyBounds']: bounds
   };
   setSettings(settings);
 }

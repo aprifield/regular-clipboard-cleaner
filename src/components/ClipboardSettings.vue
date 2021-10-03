@@ -36,6 +36,17 @@
               </v-switch>
             </v-col>
           </v-row>
+          <v-row align="center">
+            <v-col>
+              <v-switch
+                hide-details
+                :label="__('settings.showNearCursor')"
+                :input-value="settings.showNearCursor"
+                @change="onClipboardSettingsChange({ showNearCursor: $event })"
+              >
+              </v-switch>
+            </v-col>
+          </v-row>
         </v-container>
         <v-divider class="my-2"></v-divider>
         <v-container>

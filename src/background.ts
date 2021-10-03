@@ -7,7 +7,8 @@ import {
   ipcMain,
   nativeTheme,
   clipboard,
-  dialog
+  dialog,
+  screen
 } from 'electron';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
@@ -59,6 +60,7 @@ async function createWindow(mode: 'history' | 'settings') {
   // Create the browser window.
   const win = new BrowserWindow({
     icon: path.join(__static, 'icon.png'),
+    maximizable: false,
     show: false,
     skipTaskbar: mode === 'history' && settings.hideTaskbarIcon,
     webPreferences: {
@@ -96,17 +98,7 @@ async function createWindow(mode: 'history' | 'settings') {
   }
 
   const _setWindowSettings = () => {
-    setWindowSettings(mode, {
-      ...(win.isMaximized()
-        ? {
-            maximized: win.isMaximized()
-          }
-        : {
-            position: win.getPosition(),
-            size: win.getSize(),
-            maximized: win.isMaximized()
-          })
-    });
+    setWindowSettings(mode, win.getBounds());
   };
 
   win.on('closed', () => {
@@ -125,10 +117,6 @@ async function createWindow(mode: 'history' | 'settings') {
     _setWindowSettings();
   });
 
-  win.on('maximize', () => {
-    _setWindowSettings();
-  });
-
   win.on('unmaximize', () => {
     _setWindowSettings();
   });
@@ -137,19 +125,50 @@ async function createWindow(mode: 'history' | 'settings') {
 async function showOrCreateWindow(mode: 'history' | 'settings') {
   const win = mode === 'settings' ? settingsWin : historyWin;
   if (win) {
+    const settings = getSettings();
     const windowSettings = getWindowSettings(mode);
-    if (windowSettings && windowSettings.maximized) {
-      win.maximize();
+
+    const bounds = {
+      ...win.getBounds(),
+      ...windowSettings
+    };
+
+    if (mode === 'history' && settings.showNearCursor) {
+      const point = screen.getCursorScreenPoint();
+      bounds.x = point.x;
+      bounds.y = point.y;
     }
-    win.show();
-    if (windowSettings && windowSettings.size && windowSettings.position) {
-      win.setBounds({
-        width: windowSettings.size[0] || 800,
-        height: windowSettings.size[1] || 600,
-        x: windowSettings.position[0] || 0,
-        y: windowSettings.position[1] || 0
-      });
+
+    const display = screen.getDisplayNearestPoint(bounds);
+    const displayLeft = display.workArea.x;
+    const displayRight = display.workArea.x + display.workArea.width;
+    const displayTop = display.workArea.y;
+    const displayBottom = display.workArea.y + display.workArea.height;
+
+    if (displayRight < bounds.x + bounds.width) {
+      bounds.x -= bounds.x + bounds.width - displayRight;
     }
+    if (bounds.x < displayLeft) {
+      bounds.x = displayLeft;
+    }
+    if (displayBottom < bounds.y + bounds.height) {
+      bounds.y -= bounds.y + bounds.height - displayBottom;
+    }
+    if (bounds.y < displayTop) {
+      bounds.y = displayTop;
+    }
+
+    win.setOpacity(0);
+    win.show(); // When minimized, show must be run before setBounds
+    const setBounds: 'setBounds' | 'setContentBounds' =
+      mode === 'history' && settings.showNearCursor
+        ? 'setContentBounds'
+        : 'setBounds';
+    win[setBounds](bounds);
+    win[setBounds](bounds); // When using multiple displays, a single position adjustment will not display the correct position
+    setTimeout(() => {
+      win.setOpacity(1);
+    });
   } else {
     createWindow(mode);
   }
