@@ -40,6 +40,7 @@
   "settings.pasteAfterCopyComment": "Mac では動きません",
   "settings.commandAfterCopy": "コピー後に実行するコマンド",
   "settings.commandAfterCopyTimeout": "コピー後にコマンドを実行するまでの待機時間",
+  "settings.showFrame": "クリップボード履歴画面にフレームやメニューバーを表示する",
   "settings.hideDockIcon": "アイコンを Dock に表示しない",
   "settings.hideTaskbarIcon": "アイコンをタスクバーに表示しない",
   "settings.shortcutComment": "クリップボード履歴を表示するショートカット"

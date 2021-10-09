@@ -238,6 +238,17 @@
           <v-row align="center">
             <v-col>
               <v-switch
+                hide-details
+                :label="__('settings.showFrame')"
+                :input-value="settings.showFrame"
+                @change="onClipboardSettingsChange({ showFrame: $event })"
+              >
+              </v-switch>
+            </v-col>
+          </v-row>
+          <v-row align="center">
+            <v-col>
+              <v-switch
                 v-if="platform == 'darwin'"
                 hide-details
                 :label="__('settings.hideDockIcon')"

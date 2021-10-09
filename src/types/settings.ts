@@ -8,6 +8,7 @@ export interface Settings {
   monitorInterval?: number;
   clearInterval?: number;
   maxHistoryCount?: number;
+  showFrame?: boolean;
   hideTaskbarIcon?: boolean;
   hideDockIcon?: boolean;
   shortcut?: {

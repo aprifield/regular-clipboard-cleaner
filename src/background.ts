@@ -60,6 +60,7 @@ async function createWindow(mode: 'history' | 'settings') {
   // Create the browser window.
   const win = new BrowserWindow({
     icon: path.join(__static, 'icon.png'),
+    frame: mode === 'settings' || settings.showFrame,
     maximizable: false,
     show: false,
     skipTaskbar: mode === 'history' && settings.hideTaskbarIcon,
@@ -301,6 +302,11 @@ ipcMain
     sendToWebContents();
   })
   .on('web-settings-change', (event, [settings]: [Settings]) => {
+    if (historyWin) {
+      if (getSettings().showFrame !== settings.showFrame) {
+        historyWin.close();
+      }
+    }
     setSettings(settings);
     restartMonitoring();
     registerShortcut();
