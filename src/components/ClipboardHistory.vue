@@ -4,12 +4,13 @@
       <v-card-title>
         <v-text-field
           ref="textField"
-          v-model="search"
           append-icon="mdi-magnify"
           dense
           hide-details
           label="Search (press /)"
           single-line
+          :value="search"
+          @input="onSearchInput"
           @focus="isTextFieldFocused = true"
           @blur="isTextFieldFocused = false"
         ></v-text-field>
@@ -29,6 +30,7 @@
               class="v-list-item--link primary--text"
               :class="{ 'v-list-item--active': index === selectedIndex }"
               dense
+              @click="selectedIndex = index"
             >
               <v-list-item-icon class="mr-2">
                 <span
@@ -99,6 +101,7 @@ export default Vue.extend({
       search: '',
       isTextFieldFocused: false,
       selectedIndex: -1,
+      searchTimeoutId: -1,
       findTargetTimeoutId: -1,
       historyItemHeight: 40,
       historyContainerHeight: 300
@@ -112,14 +115,15 @@ export default Vue.extend({
       });
     },
     currentHistoryItems(): TableHistoryItems[] {
-      return this.tableHistoryItems.filter(item => {
-        return this.search
-          ? item.row + '' === this.search ||
-              item.text
-                .toLocaleLowerCase()
-                .includes(this.search.toLocaleLowerCase())
-          : true;
-      });
+      if (this.search) {
+        return this.tableHistoryItems.filter(item => {
+          return item.text
+            .toLocaleLowerCase()
+            .includes(this.search.toLocaleLowerCase());
+        });
+      } else {
+        return this.tableHistoryItems;
+      }
     }
   },
 
@@ -168,14 +172,14 @@ export default Vue.extend({
             `#clipboard-row-${targetIndex}`
           );
           if (targetRow) {
-            clearInterval(this.findTargetTimeoutId);
+            window.clearInterval(this.findTargetTimeoutId);
             this.findTargetTimeoutId = -1;
             resolve(targetRow);
             return;
           }
 
           if (10 < retryCount) {
-            clearInterval(this.findTargetTimeoutId);
+            window.clearInterval(this.findTargetTimeoutId);
             this.findTargetTimeoutId = -1;
             reject();
             return;
@@ -185,6 +189,12 @@ export default Vue.extend({
           console.log('[ClipboardHistory] find target row failed.', retryCount);
         });
       });
+    },
+    onSearchInput(search: string) {
+      window.clearTimeout(this.searchTimeoutId);
+      this.searchTimeoutId = window.setTimeout(() => {
+        this.search = search;
+      }, 300);
     },
     async onWindowKeyDown(event: KeyboardEvent) {
       if (event.isComposing) {
