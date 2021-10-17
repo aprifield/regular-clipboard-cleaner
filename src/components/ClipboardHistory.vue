@@ -208,7 +208,9 @@ export default Vue.extend({
       } else if (event.code === 'Slash') {
         if (!this.isTextFieldFocused) {
           event.preventDefault();
-          (this.$refs.textField as Vue).$el.querySelector('input')?.focus();
+          ((this.$refs.textField as Vue).$el.querySelector(
+            'input'
+          ) as HTMLInputElement).focus();
         }
       } else if (event.code === 'Enter') {
         event.preventDefault();
@@ -226,7 +228,9 @@ export default Vue.extend({
         }
 
         if (this.isTextFieldFocused) {
-          (this.$refs.textField as Vue).$el.querySelector('input')?.blur();
+          ((this.$refs.textField as Vue).$el.querySelector(
+            'input'
+          ) as HTMLInputElement).blur();
         }
 
         const currentSelectedIndex = this.selectedIndex;

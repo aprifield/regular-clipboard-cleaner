@@ -91,11 +91,11 @@ export default Vue.extend({
     this.platform = platform;
 
     if (platform === 'win32') {
-      const html = document.querySelector('html');
+      const html = document.querySelector('html') as HTMLHtmlElement;
       if (shouldUseDarkColors) {
-        html?.classList.add('webkit-scrollbar--dark');
+        html.classList.add('webkit-scrollbar--dark');
       } else {
-        html?.classList.add('webkit-scrollbar--light');
+        html.classList.add('webkit-scrollbar--light');
       }
     }
 

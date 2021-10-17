@@ -20,7 +20,6 @@
   "main": "background.js",
   "dependencies": {
     "@mdi/font": "5.9.55",
-    "core-js": "^3.6.5",
     "electron-store": "^7.0.2",
     "robotjs": "^0.6.0",
     "roboto-fontface": "*",
@@ -31,7 +30,6 @@
     "@types/electron-devtools-installer": "^2.2.0",
     "@typescript-eslint/eslint-plugin": "^2.33.0",
     "@typescript-eslint/parser": "^2.33.0",
-    "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-eslint": "~4.5.0",
     "@vue/cli-plugin-typescript": "~4.5.0",
     "@vue/cli-service": "~4.5.0",
