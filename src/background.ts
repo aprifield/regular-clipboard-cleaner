@@ -26,7 +26,7 @@ import '@/background/app-tray-helper';
 import '@/background/app-menu-helper';
 import { setOpenAtLogin } from '@/background/app-login-helper';
 import { switchTaskbarIcon } from '@/background/app-taskbar-helper';
-import { switchDockIcon } from '@/background/app-dock-helper';
+import { showDockIcon, switchDockIcon } from '@/background/app-dock-helper';
 import { registerShortcut } from '@/background/global-shortcut-helper';
 import '@/background/clipboard-cleaner';
 import {
@@ -76,6 +76,7 @@ async function createWindow(mode: 'history' | 'settings') {
   });
   if (mode === 'settings') {
     settingsWin = win;
+    showDockIcon();
   } else {
     historyWin = win;
   }
@@ -105,6 +106,7 @@ async function createWindow(mode: 'history' | 'settings') {
   win.on('closed', () => {
     if (mode === 'settings') {
       settingsWin = null;
+      switchDockIcon();
     } else {
       historyWin = null;
     }
@@ -115,10 +117,6 @@ async function createWindow(mode: 'history' | 'settings') {
   });
 
   win.on('resized', () => {
-    _setWindowSettings();
-  });
-
-  win.on('unmaximize', () => {
     _setWindowSettings();
   });
 }
@@ -210,7 +208,7 @@ app.on('ready', async () => {
     try {
       await installExtension(VUEJS_DEVTOOLS);
     } catch (e) {
-      console.error('Vue Devtools failed to install:', e.toString());
+      console.error('Vue Devtools failed to install:', e);
     }
   }
 });
@@ -312,7 +310,6 @@ ipcMain
     registerShortcut();
     setOpenAtLogin();
     switchTaskbarIcon(historyWin);
-    switchDockIcon();
     sendToWebContents();
   })
   .on('app-menu-settings-click', () => {
