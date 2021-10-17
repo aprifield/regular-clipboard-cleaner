@@ -19,9 +19,11 @@
   },
   "main": "background.js",
   "dependencies": {
+    "@mdi/font": "5.9.55",
     "core-js": "^3.6.5",
     "electron-store": "^7.0.2",
     "robotjs": "^0.6.0",
+    "roboto-fontface": "*",
     "vue": "^2.6.11",
     "vuetify": "^2.4.0"
   },
