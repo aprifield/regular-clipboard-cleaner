@@ -14,7 +14,13 @@ const settingsStore = new Store<{ settings: Settings }>({
   name: '.settings',
   fileExtension: '',
   encryptionKey: 'jbBsbiyUGNwtRc3rUbwBgrbPi3PUztqD',
-  defaults: { settings: { showNearCursor: true } }
+  defaults: {
+    settings: {
+      pasteAfterCopy: process.platform !== 'darwin',
+      closeAfterCopy: true,
+      showNearCursor: true
+    }
+  }
 });
 
 console.log('[electron-store-helper] path', clipboardStore.path);

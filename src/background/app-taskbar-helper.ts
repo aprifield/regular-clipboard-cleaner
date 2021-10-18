@@ -10,5 +10,5 @@ export function switchTaskbarIcon(win: BrowserWindow | null) {
   }
 
   const settings = getSettings();
-  win.setSkipTaskbar(!!settings.hideTaskbarIcon);
+  win.setSkipTaskbar(!settings.showTaskbarIcon);
 }

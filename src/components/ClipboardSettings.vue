@@ -25,28 +25,6 @@
               </v-switch>
             </v-col>
           </v-row>
-          <v-row align="center">
-            <v-col>
-              <v-switch
-                hide-details
-                :label="__('settings.closeAfterCopy')"
-                :input-value="settings.closeAfterCopy"
-                @change="onClipboardSettingsChange({ closeAfterCopy: $event })"
-              >
-              </v-switch>
-            </v-col>
-          </v-row>
-          <v-row align="center">
-            <v-col>
-              <v-switch
-                hide-details
-                :label="__('settings.showNearCursor')"
-                :input-value="settings.showNearCursor"
-                @change="onClipboardSettingsChange({ showNearCursor: $event })"
-              >
-              </v-switch>
-            </v-col>
-          </v-row>
         </v-container>
         <v-divider class="my-2"></v-divider>
         <v-container>
@@ -172,7 +150,7 @@
                 @change="onClipboardSettingsChange({ pasteAfterCopy: $event })"
               >
               </v-switch>
-              <span class="text-caption">
+              <span v-if="platform === 'darwin'" class="text-caption">
                 ({{ __('settings.pasteAfterCopyComment') }})
               </span>
             </v-col>
@@ -232,9 +210,31 @@
               </v-text-field>
             </v-col>
           </v-row>
+          <v-row align="center">
+            <v-col>
+              <v-switch
+                hide-details
+                :label="__('settings.closeAfterCopy')"
+                :input-value="settings.closeAfterCopy"
+                @change="onClipboardSettingsChange({ closeAfterCopy: $event })"
+              >
+              </v-switch>
+            </v-col>
+          </v-row>
         </v-container>
         <v-divider class="my-2"></v-divider>
         <v-container>
+          <v-row align="center">
+            <v-col>
+              <v-switch
+                hide-details
+                :label="__('settings.showNearCursor')"
+                :input-value="settings.showNearCursor"
+                @change="onClipboardSettingsChange({ showNearCursor: $event })"
+              >
+              </v-switch>
+            </v-col>
+          </v-row>
           <v-row align="center">
             <v-col>
               <v-switch
@@ -249,19 +249,19 @@
           <v-row align="center">
             <v-col>
               <v-switch
-                v-if="platform == 'darwin'"
+                v-if="platform === 'darwin'"
                 hide-details
-                :label="__('settings.hideDockIcon')"
-                :input-value="settings.hideDockIcon"
-                @change="onClipboardSettingsChange({ hideDockIcon: $event })"
+                :label="__('settings.showDockIcon')"
+                :input-value="settings.showDockIcon"
+                @change="onClipboardSettingsChange({ showDockIcon: $event })"
               >
               </v-switch>
               <v-switch
                 v-else
                 hide-details
-                :label="__('settings.hideTaskbarIcon')"
-                :input-value="settings.hideTaskbarIcon"
-                @change="onClipboardSettingsChange({ hideTaskbarIcon: $event })"
+                :label="__('settings.showTaskbarIcon')"
+                :input-value="settings.showTaskbarIcon"
+                @change="onClipboardSettingsChange({ showTaskbarIcon: $event })"
               >
               </v-switch>
             </v-col>

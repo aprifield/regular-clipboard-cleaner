@@ -15,10 +15,10 @@ export function switchDockIcon() {
   }
 
   const settings = getSettings();
-  if (settings.hideDockIcon) {
-    app.dock.hide();
-  } else {
+  if (settings.showDockIcon) {
     app.dock.show();
+  } else {
+    app.dock.hide();
   }
 }
 

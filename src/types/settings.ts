@@ -3,14 +3,13 @@ import { Rectangle } from 'electron';
 export interface Settings {
   startAtLogin?: boolean;
   maintained?: boolean;
-  closeAfterCopy?: boolean;
   showNearCursor?: boolean;
   monitorInterval?: number;
   clearInterval?: number;
   maxHistoryCount?: number;
   showFrame?: boolean;
-  hideTaskbarIcon?: boolean;
-  hideDockIcon?: boolean;
+  showTaskbarIcon?: boolean;
+  showDockIcon?: boolean;
   shortcut?: {
     commandOrControl?: boolean;
     alt?: boolean;
@@ -21,6 +20,7 @@ export interface Settings {
   pasteAfterCopyTimeout?: number;
   commandAfterCopy?: string;
   commandAfterCopyTimeout?: number;
+  closeAfterCopy?: boolean;
   historyBounds?: Rectangle;
   settingsBounds?: Rectangle;
 }

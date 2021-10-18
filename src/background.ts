@@ -63,7 +63,7 @@ async function createWindow(mode: 'history' | 'settings') {
     frame: mode === 'settings' || settings.showFrame,
     maximizable: false,
     show: false,
-    skipTaskbar: mode === 'history' && settings.hideTaskbarIcon,
+    skipTaskbar: mode === 'history' && !settings.showTaskbarIcon,
     webPreferences: {
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
