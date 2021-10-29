@@ -42,7 +42,7 @@
               </v-list-item-icon>
               <v-list-item-content>
                 <v-list-item-title>
-                  {{ item.text }}
+                  <ClipboardHistoryText :text="item.text" />
                 </v-list-item-title>
               </v-list-item-content>
               <v-list-item-icon class="action-button" title="Copy to clipboard">
@@ -83,6 +83,7 @@
 <script lang="ts">
 import Vue, { PropType } from 'vue';
 import { HistoryItem } from '@/types/history-item';
+import ClipboardHistoryText from '@/components/ClipboardHistoryText.vue';
 
 interface TableHistoryItems extends HistoryItem {
   index: number;
@@ -91,6 +92,8 @@ interface TableHistoryItems extends HistoryItem {
 
 export default Vue.extend({
   name: 'ClipboardHistory',
+
+  components: { ClipboardHistoryText },
 
   props: {
     historyItems: { type: Array as PropType<HistoryItem[]>, default: () => [] }
@@ -204,7 +207,7 @@ export default Vue.extend({
       if (event.code === 'Escape') {
         event.preventDefault();
         this.$emit('clipboard-escape-keydown');
-        this.search = '';
+        this.initStatus();
       } else if (event.code === 'Slash') {
         if (!this.isTextFieldFocused) {
           event.preventDefault();
