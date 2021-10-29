@@ -84,8 +84,7 @@ async function createWindow(mode: 'history' | 'settings') {
   const params = [
     `mode=${mode}`,
     `locale=${app.getLocale()}`,
-    `platform=${process.platform}`,
-    `shouldUseDarkColors=${nativeTheme.shouldUseDarkColors}`
+    `platform=${process.platform}`
   ].join('&');
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
@@ -231,6 +230,10 @@ if (isDevelopment) {
 const sendToWebContents = () => {
   const historyItems = getHistoryItems();
   const settings = getSettings();
+  if (settings.darkTheme === undefined) {
+    settings.darkTheme = nativeTheme.shouldUseDarkColors;
+    setSettings(settings);
+  }
   if (historyWin) {
     historyWin.webContents.send('init-history', historyItems);
     historyWin.webContents.send('init-settings', settings);

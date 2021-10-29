@@ -82,22 +82,10 @@ export default Vue.extend({
     const mode = searchParams.get('mode') || 'history';
     const locale = searchParams.get('locale') || 'en';
     const platform = searchParams.get('platform') || 'win32';
-    const shouldUseDarkColors =
-      searchParams.get('shouldUseDarkColors') === 'true';
 
-    this.$vuetify.theme.dark = shouldUseDarkColors;
     this.mode = mode;
     this.locale = locale;
     this.platform = platform;
-
-    if (platform === 'win32') {
-      const html = document.querySelector('html') as HTMLHtmlElement;
-      if (shouldUseDarkColors) {
-        html.classList.add('webkit-scrollbar--dark');
-      } else {
-        html.classList.add('webkit-scrollbar--light');
-      }
-    }
 
     this.ipcBridge.send('web-app-created');
     this.ipcBridge.on('init-history', (event, args) => {
@@ -105,6 +93,17 @@ export default Vue.extend({
     });
     this.ipcBridge.on('init-settings', (event, args) => {
       this.settings = args;
+      this.$vuetify.theme.dark = !!this.settings.darkTheme;
+      if (platform === 'win32') {
+        const html = document.querySelector('html') as HTMLHtmlElement;
+        if (this.settings.darkTheme) {
+          html.classList.remove('webkit-scrollbar--light');
+          html.classList.add('webkit-scrollbar--dark');
+        } else {
+          html.classList.remove('webkit-scrollbar--dark');
+          html.classList.add('webkit-scrollbar--light');
+        }
+      }
     });
   },
 

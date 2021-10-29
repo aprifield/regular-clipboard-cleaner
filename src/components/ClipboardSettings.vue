@@ -266,6 +266,17 @@
               </v-switch>
             </v-col>
           </v-row>
+          <v-row align="center">
+            <v-col>
+              <v-switch
+                hide-details
+                :label="__('settings.darkTheme')"
+                :input-value="settings.darkTheme"
+                @change="onClipboardSettingsChange({ darkTheme: $event })"
+              >
+              </v-switch>
+            </v-col>
+          </v-row>
         </v-container>
       </v-card-text>
     </v-card>
