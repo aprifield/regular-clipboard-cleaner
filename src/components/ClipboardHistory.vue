@@ -30,7 +30,8 @@
               class="v-list-item--link primary--text"
               :class="{ 'v-list-item--active': index === selectedIndex }"
               dense
-              @click="selectedIndex = index"
+              @click="onListItemClick(item.text, $event)"
+              @mousedown="selectedIndex = index"
             >
               <v-list-item-icon class="mr-2">
                 <span
@@ -49,26 +50,8 @@
                   />
                 </v-list-item-title>
               </v-list-item-content>
-              <v-list-item-icon class="action-button" title="Copy to clipboard">
-                <v-btn
-                  icon
-                  small
-                  @click="
-                    () => {
-                      $emit('clipboard-copy-click', item.text);
-                      initStatus();
-                    }
-                  "
-                >
-                  <v-icon>mdi-clipboard-outline</v-icon>
-                </v-btn>
-              </v-list-item-icon>
               <v-list-item-icon class="action-button" title="Delete">
-                <v-btn
-                  icon
-                  small
-                  @click="$emit('clipboard-delete-click', item.text)"
-                >
+                <v-btn icon small @click.stop="onDeleteClick(item.text)">
                   <v-icon>mdi-trash-can-outline</v-icon>
                 </v-btn>
               </v-list-item-icon>
@@ -203,6 +186,13 @@ export default Vue.extend({
         this.search = search;
       }, 300);
     },
+    onListItemClick(text: string, event: MouseEvent) {
+      this.$emit('clipboard-list-item-click', text, event);
+      this.initStatus();
+    },
+    onDeleteClick(text: string) {
+      this.$emit('clipboard-delete-click', text);
+    },
     async onWindowKeyDown(event: KeyboardEvent) {
       if (event.isComposing) {
         return;
@@ -313,7 +303,7 @@ export default Vue.extend({
   height: calc(100vh - 62px);
 }
 .v-list-item--link {
-  cursor: auto;
+  cursor: pointer;
   -webkit-user-select: auto;
   -moz-user-select: auto;
   -ms-user-select: auto;

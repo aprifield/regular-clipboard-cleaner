@@ -11,7 +11,7 @@
       <ClipboardHistory
         v-else
         :historyItems="historyItems"
-        @clipboard-copy-click="onClipboardCopyClick"
+        @clipboard-list-item-click="onClipboardListItemClick"
         @clipboard-delete-click="onClipboardDeleteClick"
         @clipboard-enter-keydown="onClipboardEnterKeyDown"
         @clipboard-escape-keydown="onClipboardEscapeKeyDown"
@@ -60,8 +60,12 @@ export default Vue.extend({
   },
 
   methods: {
-    onClipboardCopyClick(text: string) {
-      this.ipcBridge.send('web-copy-click', text);
+    onClipboardListItemClick(text: string, event: MouseEvent) {
+      if (event.ctrlKey) {
+        this.ipcBridge.send('web-list-item-ctrl-click', text);
+      } else {
+        this.ipcBridge.send('web-list-item-click', text);
+      }
     },
     onClipboardDeleteClick(text: string) {
       this.ipcBridge.send('web-delete-click', text);

@@ -34,6 +34,7 @@ import {
   deleteHistory,
   restartMonitoring
 } from '@/background/clipboard-cleaner';
+import rules from '@/util/rules';
 import { Settings } from '@/types/settings';
 const isDevelopment = process.env.NODE_ENV !== 'production';
 const gotTheLock = app.requestSingleInstanceLock();
@@ -244,26 +245,33 @@ const sendToWebContents = () => {
   }
 };
 
-const copyTextAndExecCommand = (text: string) => {
+const copyTextAndPostProcess = (text: string, isPasteDisabled = false) => {
   clipboard.writeText(text);
   const settings = getSettings();
-  if (settings.pasteAfterCopy) {
-    setTimeout(() => {
-      robot.keyTap('v', 'control');
-    }, settings.pasteAfterCopyTimeout || 200);
+  if (!isPasteDisabled) {
+    if (settings.pasteAfterCopy) {
+      setTimeout(() => {
+        robot.keyTap('v', 'control');
+      }, rules.pasteAfterCopyTimeout.value(settings.pasteAfterCopyTimeout));
+    }
+    if (settings.commandAfterCopy) {
+      setTimeout(() => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        exec(settings.commandAfterCopy!, (error: ExecException | null) => {
+          if (error) {
+            dialog.showErrorBox(
+              'Command Error',
+              `The command [${settings.commandAfterCopy}] failed.`
+            );
+          }
+        });
+      }, rules.commandAfterCopyTimeout.value(settings.commandAfterCopyTimeout));
+    }
   }
-  if (settings.commandAfterCopy) {
-    setTimeout(() => {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      exec(settings.commandAfterCopy!, (error: ExecException | null) => {
-        if (error) {
-          dialog.showErrorBox(
-            'Command Error',
-            `The command [${settings.commandAfterCopy}] failed.`
-          );
-        }
-      });
-    }, settings.commandAfterCopyTimeout || 200);
+  if (getSettings().closeAfterCopy) {
+    if (historyWin) {
+      hideWindow('history');
+    }
   }
 };
 
@@ -277,21 +285,14 @@ ipcMain
       showOrCreateWindow(mode);
     }
   )
-  .on('web-copy-click', (event, [text]: [string]) => {
-    copyTextAndExecCommand(text);
-    if (getSettings().closeAfterCopy) {
-      if (historyWin) {
-        hideWindow('history');
-      }
-    }
+  .on('web-list-item-click', (event, [text]: [string]) => {
+    copyTextAndPostProcess(text);
+  })
+  .on('web-list-item-ctrl-click', (event, [text]: [string]) => {
+    copyTextAndPostProcess(text, true);
   })
   .on('web-enter-keydown', (event, [text]: [string]) => {
-    copyTextAndExecCommand(text);
-    if (getSettings().closeAfterCopy) {
-      if (historyWin) {
-        hideWindow('history');
-      }
-    }
+    copyTextAndPostProcess(text);
   })
   .on('web-escape-keydown', () => {
     if (historyWin) {
