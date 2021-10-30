@@ -38,6 +38,19 @@ const rules = {
       return obj.rule(value) ? Number(value) : obj.init;
     }
   },
+  maxTextLength: {
+    init: 100000,
+    min: 1,
+    max: Number.MAX_SAFE_INTEGER,
+    rule: (value: string | number | undefined): boolean => {
+      const obj = rules.maxTextLength;
+      return obj.min <= Number(value) && Number(value) <= obj.max;
+    },
+    value: (value: string | number | undefined): number => {
+      const obj = rules.maxTextLength;
+      return obj.rule(value) ? Number(value) : obj.init;
+    }
+  },
   pasteAfterCopyTimeout: {
     init: 200,
     min: 0,

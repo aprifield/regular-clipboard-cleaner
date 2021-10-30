@@ -77,6 +77,19 @@
               >
               </v-text-field>
             </v-col>
+            <v-col cols="12" sm="6">
+              <v-text-field
+                hide-details
+                :label="__('settings.maxTextLength')"
+                :min="rules.maxTextLength.min"
+                :max="rules.maxTextLength.max"
+                :rules="[rules.maxTextLength.rule]"
+                type="number"
+                :value="rules.maxTextLength.value(settings.maxTextLength)"
+                @change="onClipboardSettingsChange({ maxTextLength: +$event })"
+              >
+              </v-text-field>
+            </v-col>
           </v-row>
         </v-container>
         <v-divider class="my-2"></v-divider>

@@ -6,6 +6,7 @@ export interface Settings {
   clearInterval?: number;
   monitorInterval?: number;
   maxHistoryCount?: number;
+  maxTextLength?: number;
   shortcut?: {
     commandOrControl?: boolean;
     alt?: boolean;

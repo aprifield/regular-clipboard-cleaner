@@ -33,6 +33,7 @@
   "settings.clearInterval": "Interval to clear the clipboard",
   "settings.monitorInterval": "Interval to monitor the clipboard",
   "settings.maxHistoryCount": "Number of clipboard histories to be saved",
+  "settings.maxTextLength": "Maximum length of text to be saved in the clipboard history",
   "settings.shortcutComment": "Shortcut for displaying the clipboard history window",
   "settings.pasteAfterCopy": "Paste after copying",
   "settings.pasteAfterCopyTimeout": "Wait time before pasting",

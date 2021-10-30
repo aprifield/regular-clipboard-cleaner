@@ -15,6 +15,7 @@ function startMonitoring() {
   const monitorInterval = rules.monitorInterval.value(settings.monitorInterval);
   const clearInterval = rules.clearInterval.value(settings.clearInterval);
   const maxHistoryCount = rules.maxHistoryCount.value(settings.maxHistoryCount);
+  const maxTextLength = rules.maxTextLength.value(settings.maxTextLength);
 
   let lastClearedTime = new Date().getTime();
 
@@ -37,7 +38,7 @@ function startMonitoring() {
     return setInterval(() => {
       const time = new Date().getTime();
       const text = clipboard.readText();
-      if (!text) {
+      if (!text || text.length > maxTextLength) {
         const diff = time - lastClearedTime;
         console.log('[clipboard-cleaner] diff', diff / 1000);
         if (clearInterval * 1000 <= diff) {
