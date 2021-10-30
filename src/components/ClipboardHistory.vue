@@ -42,7 +42,11 @@
               </v-list-item-icon>
               <v-list-item-content>
                 <v-list-item-title>
-                  <ClipboardHistoryText :text="item.text" />
+                  <ClipboardHistoryText
+                    :text="item.text"
+                    :time="item.time"
+                    :tooltip="index === selectedIndex"
+                  />
                 </v-list-item-title>
               </v-list-item-content>
               <v-list-item-icon class="action-button" title="Copy to clipboard">
