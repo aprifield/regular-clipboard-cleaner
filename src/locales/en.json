@@ -45,5 +45,6 @@
   "settings.showFrame": "Show frame and menu bar on the clipboard history window",
   "settings.showDockIcon": "Show the icon in the Dock",
   "settings.showTaskbarIcon": "Show the icon in the taskbar",
-  "settings.darkTheme": "Dark theme"
+  "settings.darkTheme": "Dark theme",
+  "settings.blockList": "Set words not to be saved in the clipboard history"
 }

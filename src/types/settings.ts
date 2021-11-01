@@ -23,6 +23,7 @@ export interface Settings {
   showTaskbarIcon?: boolean;
   showDockIcon?: boolean;
   darkTheme?: boolean;
+  blockList?: string[];
   historyBounds?: Rectangle;
   settingsBounds?: Rectangle;
 }

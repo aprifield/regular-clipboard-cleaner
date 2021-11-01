@@ -291,6 +291,50 @@
             </v-col>
           </v-row>
         </v-container>
+        <v-divider class="my-2"></v-divider>
+        <v-container>
+          <v-row align="center">
+            <v-col>
+              <v-expansion-panels flat>
+                <v-expansion-panel>
+                  <v-expansion-panel-header>
+                    {{ __('settings.blockList') }}
+                  </v-expansion-panel-header>
+                  <v-expansion-panel-content>
+                    <v-combobox
+                      :value="settings.blockList || []"
+                      :append-icon="null"
+                      hide-details
+                      label="Block list"
+                      multiple
+                      outlined
+                      @input="onClipboardSettingsChange({ blockList: $event })"
+                    >
+                      <template
+                        v-slot:selection="{ attrs, item, parent, selected }"
+                      >
+                        <v-chip
+                          v-bind="attrs"
+                          color="secondary"
+                          :input-value="selected"
+                          label
+                          small
+                        >
+                          <span class="pr-2">
+                            {{ item }}
+                          </span>
+                          <v-icon small @click="parent.selectItem(item)">
+                            $delete
+                          </v-icon>
+                        </v-chip>
+                      </template>
+                    </v-combobox>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+              </v-expansion-panels>
+            </v-col>
+          </v-row>
+        </v-container>
       </v-card-text>
     </v-card>
   </v-container>
@@ -345,5 +389,19 @@ export default Vue.extend({
 }
 .v-input--selection-controls {
   margin-top: 0;
+}
+.v-expansion-panel-header {
+  padding: 0;
+}
+.v-expansion-panel-content {
+  ::v-deep .v-expansion-panel-content__wrap {
+    padding: 0;
+  }
+}
+.theme--light.v-expansion-panels .v-expansion-panel {
+  color: rgba(0, 0, 0, 0.6);
+}
+.theme--dark.v-expansion-panels .v-expansion-panel {
+  color: rgba(255, 255, 255, 0.7);
 }
 </style>

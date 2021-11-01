@@ -45,5 +45,6 @@
   "settings.showFrame": "クリップボード履歴画面にフレームやメニューバーを表示する",
   "settings.showDockIcon": "Dock にアイコンを表示する",
   "settings.showTaskbarIcon": "タスクバーにアイコンを表示する",
-  "settings.darkTheme": "ダークテーマ"
+  "settings.darkTheme": "ダークテーマ",
+  "settings.blockList": "クリップボード履歴に保存しない単語を設定する"
 }

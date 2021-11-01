@@ -17,6 +17,14 @@ function startMonitoring() {
   const maxHistoryCount = rules.maxHistoryCount.value(settings.maxHistoryCount);
   const maxTextLength = rules.maxTextLength.value(settings.maxTextLength);
 
+  let blockListRegExp: RegExp | undefined;
+  const blockList = (settings.blockList || [])
+    .map(str => str.replace(/[.*+?^=!:${}()|[\]/\\]/g, '\\$&'))
+    .join('|');
+  if (blockList) {
+    blockListRegExp = new RegExp(blockList, 'i');
+  }
+
   let lastClearedTime = new Date().getTime();
 
   const clearClipboard = () => {
@@ -38,7 +46,11 @@ function startMonitoring() {
     return setInterval(() => {
       const time = new Date().getTime();
       const text = clipboard.readText();
-      if (!text || text.length > maxTextLength) {
+      if (
+        !text ||
+        text.length > maxTextLength ||
+        (blockListRegExp && blockListRegExp.test(text))
+      ) {
         const diff = time - lastClearedTime;
         console.log('[clipboard-cleaner] diff', diff / 1000);
         if (clearInterval * 1000 <= diff) {
