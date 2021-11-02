@@ -106,11 +106,18 @@ export default Vue.extend({
     },
     currentHistoryItems(): TableHistoryItems[] {
       if (this.search) {
-        return this.tableHistoryItems.filter(item => {
-          return item.text
-            .toLocaleLowerCase()
-            .includes(this.search.toLocaleLowerCase());
-        });
+        const wordRegExps = this.search
+          .split(' ')
+          .filter(word => word)
+          .map(word => word.replace(/[.*+?^=!:${}()|[\]/\\]/g, '\\$&'))
+          .map(word => new RegExp(word, 'i'));
+        if (wordRegExps.length) {
+          return this.tableHistoryItems.filter(item =>
+            wordRegExps.every(re => re.test(item.text))
+          );
+        } else {
+          return this.tableHistoryItems;
+        }
       } else {
         return this.tableHistoryItems;
       }
