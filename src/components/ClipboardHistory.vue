@@ -162,23 +162,18 @@ export default Vue.extend({
         (this.$refs.historyList as Vue).$el.scrollTop = visibleScrollRange[1];
       }
 
-      return new Promise((resolve: (targetRow: Element) => void, reject) => {
+      return new Promise((resolve: (targetRow: Element | null) => void) => {
         let retryCount = 0;
         this.findTargetTimeoutId = window.setInterval(() => {
           const targetRow = document.querySelector(
             `#clipboard-row-${targetIndex}`
           );
-          if (targetRow) {
-            window.clearInterval(this.findTargetTimeoutId);
-            this.findTargetTimeoutId = -1;
+          if (targetRow || 10 < retryCount) {
             resolve(targetRow);
-            return;
-          }
-
-          if (10 < retryCount) {
             window.clearInterval(this.findTargetTimeoutId);
-            this.findTargetTimeoutId = -1;
-            reject();
+            setTimeout(() => {
+              this.findTargetTimeoutId = -1;
+            });
             return;
           }
 
@@ -253,13 +248,13 @@ export default Vue.extend({
             }
           }
 
-          try {
-            const targetSelectedRow = await this.adjustScrollPositionAndFindTargetRow(
-              targetSelectedIndex
-            );
+          const targetSelectedRow = await this.adjustScrollPositionAndFindTargetRow(
+            targetSelectedIndex
+          );
+          if (targetSelectedRow) {
             targetSelectedRow.classList.add('v-list-item--active');
             this.selectedIndex = targetSelectedIndex;
-          } catch {
+          } else {
             this.selectedIndex = -1;
           }
         }
