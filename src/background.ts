@@ -176,11 +176,15 @@ async function showOrCreateWindow(mode: 'history' | 'settings') {
 async function hideWindow(mode: 'history' | 'settings') {
   const win = mode === 'settings' ? settingsWin : historyWin;
   if (win) {
-    win.setOpacity(0); // Disable minimization animation
-    win.minimize();
-    setTimeout(() => {
-      win.setOpacity(1);
-    });
+    if (process.platform === 'darwin') {
+      win.close();
+    } else {
+      win.setOpacity(0); // Disable minimization animation
+      win.minimize();
+      setTimeout(() => {
+        win.setOpacity(1);
+      });
+    }
   }
 }
 
