@@ -51,7 +51,12 @@
                 </v-list-item-title>
               </v-list-item-content>
               <v-list-item-icon class="action-button" title="Delete">
-                <v-btn icon small @click.stop="onDeleteClick(item.text)">
+                <v-btn
+                  icon
+                  small
+                  @click.stop="onDeleteClick(item.text)"
+                  @mousedown.stop
+                >
                   <v-icon>mdi-trash-can-outline</v-icon>
                 </v-btn>
               </v-list-item-icon>
@@ -126,14 +131,6 @@ export default Vue.extend({
 
   methods: {
     initStatus() {
-      if (this.selectedIndex !== -1) {
-        const selectedRow = document.querySelector(
-          `#clipboard-row-${this.selectedIndex}`
-        );
-        if (selectedRow) {
-          selectedRow.classList.remove('v-list-item--active');
-        }
-      }
       this.search = '';
       this.selectedIndex = -1;
     },
@@ -194,6 +191,7 @@ export default Vue.extend({
     },
     onDeleteClick(text: string) {
       this.$emit('clipboard-delete-click', text);
+      this.selectedIndex = -1;
     },
     async onWindowKeyDown(event: KeyboardEvent) {
       if (event.isComposing) {
@@ -232,27 +230,16 @@ export default Vue.extend({
           ) as HTMLInputElement).blur();
         }
 
-        const currentSelectedIndex = this.selectedIndex;
         const targetSelectedIndex =
           event.code === 'ArrowDown'
             ? this.selectedIndex + 1
             : this.selectedIndex - 1;
 
         if (this.currentHistoryItems[targetSelectedIndex]) {
-          if (this.currentHistoryItems[currentSelectedIndex]) {
-            const currentSelectedRow = document.querySelector(
-              `#clipboard-row-${currentSelectedIndex}`
-            );
-            if (currentSelectedRow) {
-              currentSelectedRow.classList.remove('v-list-item--active');
-            }
-          }
-
           const targetSelectedRow = await this.adjustScrollPositionAndFindTargetRow(
             targetSelectedIndex
           );
           if (targetSelectedRow) {
-            targetSelectedRow.classList.add('v-list-item--active');
             this.selectedIndex = targetSelectedIndex;
           } else {
             this.selectedIndex = -1;
