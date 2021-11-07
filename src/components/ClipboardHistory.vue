@@ -75,6 +75,7 @@
 <script lang="ts">
 import Vue, { PropType } from 'vue';
 import { HistoryItem } from '@/types/history-item';
+import { HistoryEvent } from '@/types/history-event';
 import ClipboardHistoryText from '@/components/ClipboardHistoryText.vue';
 
 interface TableHistoryItems extends HistoryItem {
@@ -99,7 +100,8 @@ export default Vue.extend({
       searchTimeoutId: -1,
       findTargetTimeoutId: -1,
       historyItemHeight: 40,
-      historyContainerHeight: 300
+      historyContainerHeight: 300,
+      keyboardEvent: undefined as KeyboardEvent | undefined
     };
   },
 
@@ -133,6 +135,17 @@ export default Vue.extend({
     initStatus() {
       this.search = '';
       this.selectedIndex = -1;
+    },
+    createHistoryEvent(event: KeyboardEvent | MouseEvent): HistoryEvent {
+      const e = this.keyboardEvent || event;
+      return {
+        altKey: e.altKey,
+        code: e instanceof KeyboardEvent ? e.code : undefined,
+        ctrlKey: e.ctrlKey,
+        key: e instanceof KeyboardEvent ? e.key : undefined,
+        metaKey: e.metaKey,
+        shiftKey: e.shiftKey
+      };
     },
     async adjustScrollPositionAndFindTargetRow(targetIndex: number) {
       const maxVisibleItemCount = Math.floor(
@@ -186,7 +199,11 @@ export default Vue.extend({
       }, 300);
     },
     onListItemClick(text: string, event: MouseEvent) {
-      this.$emit('clipboard-list-item-click', text, event);
+      this.$emit(
+        'clipboard-list-item-click',
+        text,
+        this.createHistoryEvent(event)
+      );
       this.initStatus();
     },
     onDeleteClick(text: string) {
@@ -214,7 +231,8 @@ export default Vue.extend({
         if (this.currentHistoryItems[this.selectedIndex]) {
           this.$emit(
             'clipboard-enter-keydown',
-            this.currentHistoryItems[this.selectedIndex].text
+            this.currentHistoryItems[this.selectedIndex].text,
+            this.createHistoryEvent(event)
           );
           this.initStatus();
         }
@@ -244,6 +262,15 @@ export default Vue.extend({
           } else {
             this.selectedIndex = -1;
           }
+        }
+      } else {
+        this.keyboardEvent = event;
+      }
+    },
+    onWindowKeyUp(event: KeyboardEvent) {
+      if (this.keyboardEvent) {
+        if (this.keyboardEvent.code === event.code) {
+          this.keyboardEvent = undefined;
         }
       }
     },
@@ -276,12 +303,14 @@ export default Vue.extend({
 
   mounted() {
     window.addEventListener('keydown', this.onWindowKeyDown);
+    window.addEventListener('keyup', this.onWindowKeyUp);
     window.addEventListener('resize', this.onWindowResize);
     this.onWindowResize();
   },
 
   destroyed() {
     window.removeEventListener('keydown', this.onWindowKeyDown);
+    window.removeEventListener('keyup', this.onWindowKeyUp);
     window.removeEventListener('resize', this.onWindowResize);
   }
 });

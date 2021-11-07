@@ -35,6 +35,7 @@
   "settings.maxHistoryCount": "クリップボード履歴を保存する件数",
   "settings.maxTextLength": "クリップボード履歴に保存するテキストの最大文字数",
   "settings.shortcutComment": "クリップボード履歴画面を表示するショートカット",
+  "settings.preprocessing": "コピー前のテキスト加工処理を設定する",
   "settings.pasteAfterCopy": "コピー後に貼り付けを実行する",
   "settings.pasteAfterCopyTimeout": "コピー後に貼り付けを実行するまでの待機時間",
   "settings.pasteAfterCopyComment": "有効にするとアプリが落ちるかもしれません",

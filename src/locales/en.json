@@ -35,6 +35,7 @@
   "settings.maxHistoryCount": "Number of clipboard histories to be saved",
   "settings.maxTextLength": "Maximum length of text to be saved in the clipboard history",
   "settings.shortcutComment": "Shortcut for displaying the clipboard history window",
+  "settings.preprocessing": "Set text processing before copying",
   "settings.pasteAfterCopy": "Paste after copying",
   "settings.pasteAfterCopyTimeout": "Wait time before pasting",
   "settings.pasteAfterCopyComment": "The application may crash if enabled",

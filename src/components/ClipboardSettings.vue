@@ -155,6 +155,30 @@
         <v-divider class="my-2"></v-divider>
         <v-container>
           <v-row align="center">
+            <v-col>
+              <v-expansion-panels flat>
+                <v-expansion-panel>
+                  <v-expansion-panel-header>
+                    {{ __('settings.preprocessing') }}
+                  </v-expansion-panel-header>
+                  <v-expansion-panel-content>
+                    <v-textarea
+                      auto-grow
+                      hide-details
+                      outlined
+                      :placeholder="defaultPreprocessing"
+                      :value="settings.preprocessing || defaultPreprocessing"
+                      @change="
+                        onClipboardSettingsChange({ preprocessing: $event })
+                      "
+                    >
+                    </v-textarea>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+              </v-expansion-panels>
+            </v-col>
+          </v-row>
+          <v-row align="center">
             <v-col cols="12" sm="6">
               <v-switch
                 hide-details
@@ -341,10 +365,11 @@
 </template>
 
 <script lang="ts">
+import Vue, { PropType } from 'vue';
 import { Settings } from '@/types/settings';
 import { loadDictionary, translate as __ } from '@/util/i18n';
 import rules from '@/util/rules';
-import Vue, { PropType } from 'vue';
+import defaultPreprocessing from '@/util/preprocessing';
 
 export default Vue.extend({
   name: 'ClipboardSettings',
@@ -362,6 +387,9 @@ export default Vue.extend({
     },
     rules() {
       return rules;
+    },
+    defaultPreprocessing() {
+      return defaultPreprocessing;
     },
     shortcut() {
       return this.settings.shortcut || {};
@@ -389,6 +417,11 @@ export default Vue.extend({
 }
 .v-input--selection-controls {
   margin-top: 0;
+}
+.v-textarea {
+  ::v-deep textarea {
+    font-family: Consolas, monospace;
+  }
 }
 .v-expansion-panel-header {
   padding: 0;

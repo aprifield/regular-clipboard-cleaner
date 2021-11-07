@@ -23,6 +23,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { HistoryItem } from '@/types/history-item';
+import { HistoryEvent } from '@/types/history-event';
 import { Settings } from '@/types/settings';
 import ClipboardHistory from '@/components/ClipboardHistory.vue';
 import ClipboardSettings from '@/components/ClipboardSettings.vue';
@@ -47,7 +48,7 @@ export default Vue.extend({
       const ipcBridge = ((window as unknown) as {
         ipcBridge: {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          send(channel: string, data?: any): void;
+          send(channel: string, ...data: any): void;
           on(
             channel: string,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -60,18 +61,14 @@ export default Vue.extend({
   },
 
   methods: {
-    onClipboardListItemClick(text: string, event: MouseEvent) {
-      if (event.ctrlKey) {
-        this.ipcBridge.send('web-list-item-ctrl-click', text);
-      } else {
-        this.ipcBridge.send('web-list-item-click', text);
-      }
+    onClipboardListItemClick(text: string, event: HistoryEvent) {
+      this.ipcBridge.send('web-list-item-click', text, event);
     },
     onClipboardDeleteClick(text: string) {
       this.ipcBridge.send('web-delete-click', text);
     },
-    onClipboardEnterKeyDown(text: string) {
-      this.ipcBridge.send('web-enter-keydown', text);
+    onClipboardEnterKeyDown(text: string, event: HistoryEvent) {
+      this.ipcBridge.send('web-enter-keydown', text, event);
     },
     onClipboardEscapeKeyDown() {
       this.ipcBridge.send('web-escape-keydown');

@@ -13,6 +13,7 @@ export interface Settings {
     shift?: boolean;
     key?: string;
   };
+  preprocessing?: string;
   pasteAfterCopy?: boolean;
   pasteAfterCopyTimeout?: number;
   commandAfterCopy?: string;

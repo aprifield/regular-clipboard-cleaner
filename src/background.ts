@@ -35,6 +35,8 @@ import {
   restartMonitoring
 } from '@/background/clipboard-cleaner';
 import rules from '@/util/rules';
+import defaultPreprocessing from '@/util/preprocessing';
+import { HistoryEvent, PreprocessingHistoryEvent } from '@/types/history-event';
 import { Settings } from '@/types/settings';
 const isDevelopment = process.env.NODE_ENV !== 'production';
 const gotTheLock = app.requestSingleInstanceLock();
@@ -249,10 +251,25 @@ const sendToWebContents = () => {
   }
 };
 
-const copyTextAndPostProcess = (text: string, isPasteDisabled = false) => {
-  clipboard.writeText(text);
+const copyTextAndPostProcess = (text: string, historyEvent: HistoryEvent) => {
   const settings = getSettings();
-  if (!isPasteDisabled) {
+  const preprocessing = settings.preprocessing
+    ? settings.preprocessing
+    : defaultPreprocessing;
+
+  let isPastePrevent = false;
+  (historyEvent as PreprocessingHistoryEvent).preventPaste = () => {
+    isPastePrevent = true;
+  };
+  try {
+    text = eval(`(${preprocessing})(text, historyEvent)`);
+  } catch (e) {
+    text = e + '';
+  }
+
+  clipboard.writeText(text);
+
+  if (!isPastePrevent) {
     if (settings.pasteAfterCopy) {
       setTimeout(() => {
         robot.keyTap('v', 'control');
@@ -272,6 +289,7 @@ const copyTextAndPostProcess = (text: string, isPasteDisabled = false) => {
       }, rules.commandAfterCopyTimeout.value(settings.commandAfterCopyTimeout));
     }
   }
+
   if (getSettings().closeAfterCopy) {
     if (historyWin) {
       hideWindow('history');
@@ -289,15 +307,18 @@ ipcMain
       showOrCreateWindow(mode);
     }
   )
-  .on('web-list-item-click', (event, [text]: [string]) => {
-    copyTextAndPostProcess(text);
-  })
-  .on('web-list-item-ctrl-click', (event, [text]: [string]) => {
-    copyTextAndPostProcess(text, true);
-  })
-  .on('web-enter-keydown', (event, [text]: [string]) => {
-    copyTextAndPostProcess(text);
-  })
+  .on(
+    'web-list-item-click',
+    (event, [text, historyEvent]: [string, HistoryEvent]) => {
+      copyTextAndPostProcess(text, historyEvent);
+    }
+  )
+  .on(
+    'web-enter-keydown',
+    (event, [text, historyEvent]: [string, HistoryEvent]) => {
+      copyTextAndPostProcess(text, historyEvent);
+    }
+  )
   .on('web-escape-keydown', () => {
     if (historyWin) {
       hideWindow('history');
