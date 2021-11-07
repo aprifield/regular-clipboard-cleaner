@@ -181,6 +181,7 @@
           <v-row align="center">
             <v-col cols="12" sm="6">
               <v-switch
+                :disabled="platform === 'darwin'"
                 hide-details
                 :label="__('settings.pasteAfterCopy')"
                 :input-value="settings.pasteAfterCopy"

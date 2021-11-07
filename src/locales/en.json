@@ -38,7 +38,7 @@
   "settings.preprocessing": "Set text processing before copying",
   "settings.pasteAfterCopy": "Paste after copying",
   "settings.pasteAfterCopyTimeout": "Wait time before pasting",
-  "settings.pasteAfterCopyComment": "The application may crash if enabled",
+  "settings.pasteAfterCopyComment": "Cannot be enabled on Mac as it will crash the application",
   "settings.commandAfterCopy": "Command after copying",
   "settings.commandAfterCopyTimeout": "Wait time before executing the command",
   "settings.closeAfterCopy": "Close the clipboard history window after copying",

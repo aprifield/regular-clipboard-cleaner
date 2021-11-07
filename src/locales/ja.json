@@ -38,7 +38,7 @@
   "settings.preprocessing": "コピー前のテキスト加工処理を設定する",
   "settings.pasteAfterCopy": "コピー後に貼り付けを実行する",
   "settings.pasteAfterCopyTimeout": "コピー後に貼り付けを実行するまでの待機時間",
-  "settings.pasteAfterCopyComment": "有効にするとアプリが落ちるかもしれません",
+  "settings.pasteAfterCopyComment": "アプリが落ちるため Mac では有効にできません",
   "settings.commandAfterCopy": "コピー後に実行するコマンド",
   "settings.commandAfterCopyTimeout": "コピー後にコマンドを実行するまでの待機時間",
   "settings.closeAfterCopy": "コピー後にクリップボード履歴画面を閉じる",
