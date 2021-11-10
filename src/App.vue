@@ -48,7 +48,7 @@ export default Vue.extend({
       const ipcBridge = ((window as unknown) as {
         ipcBridge: {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          send(channel: string, ...data: any): void;
+          send(channel: string, ...args: any[]): void;
           on(
             channel: string,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any

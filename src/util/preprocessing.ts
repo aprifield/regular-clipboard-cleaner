@@ -1,6 +1,7 @@
 import { PreprocessingHistoryEvent } from '@/types/history-event';
 
-export const dummy = (text: string, event: PreprocessingHistoryEvent) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const dummy = (text: string, event: PreprocessingHistoryEvent) => {
   if (event.ctrlKey) {
     event.preventPaste(); // Call this if you don't want to paste.
   }

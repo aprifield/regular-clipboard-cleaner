@@ -196,6 +196,7 @@ export default Vue.extend({
       window.clearTimeout(this.searchTimeoutId);
       this.searchTimeoutId = window.setTimeout(() => {
         this.search = search;
+        this.selectedIndex = -1;
       }, 300);
     },
     onListItemClick(text: string, event: MouseEvent) {
