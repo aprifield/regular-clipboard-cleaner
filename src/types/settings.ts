@@ -14,11 +14,12 @@ export interface Settings {
     key?: string;
   };
   preprocessing?: string;
+  closeAfterCopy?: boolean;
+  closeAfterCopyTimeout?: number;
   pasteAfterCopy?: boolean;
   pasteAfterCopyTimeout?: number;
   commandAfterCopy?: string;
   commandAfterCopyTimeout?: number;
-  closeAfterCopy?: boolean;
   showNearCursor?: boolean;
   showFrame?: boolean;
   showTaskbarIcon?: boolean;

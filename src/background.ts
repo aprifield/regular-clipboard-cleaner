@@ -269,6 +269,14 @@ const copyTextAndPostProcess = (text: string, historyEvent: HistoryEvent) => {
 
   clipboard.writeText(text);
 
+  if (settings.closeAfterCopy) {
+    setTimeout(() => {
+      if (historyWin) {
+        hideWindow('history');
+      }
+    }, rules.closeAfterCopyTimeout.value(settings.closeAfterCopyTimeout));
+  }
+
   if (!isPastePrevent) {
     if (settings.pasteAfterCopy) {
       setTimeout(() => {
@@ -287,12 +295,6 @@ const copyTextAndPostProcess = (text: string, historyEvent: HistoryEvent) => {
           }
         });
       }, rules.commandAfterCopyTimeout.value(settings.commandAfterCopyTimeout));
-    }
-  }
-
-  if (getSettings().closeAfterCopy) {
-    if (historyWin) {
-      hideWindow('history');
     }
   }
 };
