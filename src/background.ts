@@ -74,7 +74,8 @@ async function createWindow(mode: 'history' | 'settings') {
       //   .ELECTRON_NODE_INTEGRATION as unknown) as boolean,
       nodeIntegration: false,
       contextIsolation: true,
-      preload: path.join(__dirname, 'preload.js')
+      preload: path.join(__dirname, 'preload.js'),
+      spellcheck: false
     }
   });
   if (mode === 'settings') {
