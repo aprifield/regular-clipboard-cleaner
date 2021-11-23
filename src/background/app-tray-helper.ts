@@ -11,21 +11,19 @@ app.whenReady().then(() => {
   const contextMenu = Menu.buildFromTemplate([
     {
       label: __('tray.clipboardHistory'),
-      click: () => {
-        ipcMain.emit('app-tray-history-click');
-      }
+      click: () => ipcMain.emit('app-tray-history-click')
+    },
+    {
+      label: __('tray.deleteAllHistory'),
+      click: () => ipcMain.emit('app-tray-delete-all-history-click')
     },
     {
       label: __('tray.settings'),
-      click: () => {
-        ipcMain.emit('app-tray-settings-click');
-      }
+      click: () => ipcMain.emit('app-tray-settings-click')
     },
     {
       label: __('tray.exit'),
-      click: () => {
-        ipcMain.emit('app-tray-exit-click');
-      }
+      click: () => ipcMain.emit('app-tray-exit-click')
     }
   ]);
 

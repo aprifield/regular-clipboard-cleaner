@@ -357,6 +357,10 @@ ipcMain
   .on('app-tray-settings-click', () => {
     showOrCreateWindow('settings');
   })
+  .on('app-tray-delete-all-history-click', () => {
+    deleteAllHistory();
+    sendToWebContents();
+  })
   .on('app-tray-exit-click', () => {
     app.quit();
   })
