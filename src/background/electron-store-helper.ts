@@ -16,6 +16,7 @@ const settingsStore = new Store<{ settings: Settings }>({
   encryptionKey: 'jbBsbiyUGNwtRc3rUbwBgrbPi3PUztqD',
   defaults: {
     settings: {
+      startAtLogin: true,
       pasteAfterCopy: process.platform !== 'darwin',
       closeAfterCopy: true,
       showNearCursor: true
