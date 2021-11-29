@@ -64,19 +64,13 @@ function startMonitoring() {
         historyItems[0].cleared ||
         historyItems[0].text !== text
       ) {
-        if (!historyItems[0]) {
-          historyItems.unshift({ text, time });
-        } else if (historyItems[0].cleared) {
-          historyItems[0] = { text, time };
-        } else if (historyItems[0].text !== text) {
-          const index = historyItems.findIndex(item => item.text === text);
-          if (0 <= index) {
-            historyItems.splice(index, 1);
-          }
-          historyItems.unshift({ text, time });
-          if (maxHistoryCount < historyItems.length) {
-            historyItems.length = maxHistoryCount;
-          }
+        const index = historyItems.findIndex(item => item.text === text);
+        if (0 <= index) {
+          historyItems.splice(index, 1);
+        }
+        historyItems.unshift({ text, time });
+        if (maxHistoryCount < historyItems.length) {
+          historyItems.length = maxHistoryCount;
         }
         setHistoryItems(historyItems);
         ipcMain.emit('clipboard-history-change', historyItems);
