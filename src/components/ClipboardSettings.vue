@@ -351,9 +351,14 @@
                       :append-icon="null"
                       hide-details
                       label="Block list"
+                      placeholder="123456, password, qwerty"
                       multiple
                       outlined
-                      @input="onClipboardSettingsChange({ blockList: $event })"
+                      @input="
+                        onClipboardSettingsChange({
+                          blockList: $event.filter(s => s)
+                        })
+                      "
                     >
                       <template
                         v-slot:selection="{ attrs, item, parent, selected }"

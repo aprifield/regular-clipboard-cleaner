@@ -180,7 +180,15 @@ async function hideWindow(mode: 'history' | 'settings') {
   const win = mode === 'settings' ? settingsWin : historyWin;
   if (win) {
     if (process.platform === 'darwin') {
-      win.close();
+      const settings = getSettings();
+      if (settings.showDockIcon) {
+        // Don't use setOpacity on mac because the minimized image is not displayed.
+        win.minimize();
+      } else {
+        // Don't use hide on windows because the paste target will not be active.
+        // The paste doesn't work on mac, so no problem.
+        win.hide();
+      }
     } else {
       win.setOpacity(0); // Disable minimization animation
       win.minimize();
@@ -203,7 +211,7 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-  if (BrowserWindow.getAllWindows().length === 0) createWindow('history');
+  if (BrowserWindow.getAllWindows().length === 0) showOrCreateWindow('history');
 });
 
 // This method will be called when Electron has finished
