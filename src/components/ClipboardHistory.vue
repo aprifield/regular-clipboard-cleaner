@@ -135,6 +135,7 @@ export default Vue.extend({
     initStatus() {
       this.search = '';
       this.selectedIndex = -1;
+      this.keyboardEvent = undefined;
     },
     createHistoryEvent(event: KeyboardEvent | MouseEvent): HistoryEvent {
       const e = this.keyboardEvent || event;
