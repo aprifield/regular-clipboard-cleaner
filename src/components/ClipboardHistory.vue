@@ -31,7 +31,7 @@
               :class="{ 'v-list-item--active': index === selectedIndex }"
               dense
               @click="onListItemClick(item.text, $event)"
-              @mousedown="selectedIndex = index"
+              @mouseover="selectedIndex = index"
             >
               <v-list-item-icon class="mr-2">
                 <span

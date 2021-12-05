@@ -6,8 +6,8 @@
     transition="fade-transition"
     :value="isTooltipVisible"
   >
-    <template v-slot:activator="{ on, attrs }">
-      <span v-bind="attrs" v-on="on">{{ text }}</span>
+    <template v-slot:activator="{ attrs }">
+      <span v-bind="attrs">{{ text }}</span>
     </template>
     <span class="caption font-italic">
       {{ new Date(time).toLocaleString() }}
