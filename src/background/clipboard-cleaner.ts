@@ -52,7 +52,7 @@ function startMonitoring() {
         (blockListRegExp && blockListRegExp.test(text))
       ) {
         const diff = time - lastClearedTime;
-        console.log('[clipboard-cleaner] diff', diff / 1000);
+        console.log('[clipboard-cleaner] block diff', diff / 1000);
         if (clearInterval * 1000 <= diff) {
           clearClipboard();
         }
@@ -77,7 +77,7 @@ function startMonitoring() {
       } else {
         if (historyItems[0].text === text) {
           const diff = time - historyItems[0].time;
-          console.log('[clipboard-cleaner] diff', diff / 1000);
+          console.log('[clipboard-cleaner] same diff', diff / 1000);
           if (clearInterval * 1000 <= diff) {
             clearClipboard();
             historyItems[0].cleared = true;
