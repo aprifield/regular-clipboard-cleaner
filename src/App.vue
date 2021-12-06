@@ -119,6 +119,7 @@ export default Vue.extend({
 <style lang="scss">
 html {
   overflow: auto;
+  user-select: none;
 }
 
 .webkit-scrollbar {
