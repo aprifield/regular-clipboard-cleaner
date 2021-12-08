@@ -51,19 +51,6 @@ const rules = {
       return obj.rule(value) ? Number(value) : obj.init;
     }
   },
-  closeAfterCopyTimeout: {
-    init: 100,
-    min: 0,
-    max: Math.pow(2, 32) / 2 - 1,
-    rule: (value: string | number | undefined): boolean => {
-      const obj = rules.closeAfterCopyTimeout;
-      return obj.min <= Number(value) && Number(value) <= obj.max;
-    },
-    value: (value: string | number | undefined): number => {
-      const obj = rules.closeAfterCopyTimeout;
-      return obj.rule(value) ? Number(value) : obj.init;
-    }
-  },
   pasteAfterCopyTimeout: {
     init: 300,
     min: 0,

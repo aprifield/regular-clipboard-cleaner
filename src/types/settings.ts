@@ -15,7 +15,6 @@ export interface Settings {
   };
   preprocessing?: string;
   closeAfterCopy?: boolean;
-  closeAfterCopyTimeout?: number;
   pasteAfterCopy?: boolean;
   pasteAfterCopyTimeout?: number;
   commandAfterCopy?: string;

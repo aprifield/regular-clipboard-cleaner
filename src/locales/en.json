@@ -38,7 +38,6 @@
   "settings.shortcutComment": "Shortcut for displaying the clipboard history window",
   "settings.preprocessing": "Set text processing before copying",
   "settings.closeAfterCopy": "Close the clipboard history window after copying",
-  "settings.closeAfterCopyTimeout": "Wait time before closing the clipboard history",
   "settings.pasteAfterCopy": "Paste after copying",
   "settings.pasteAfterCopyTimeout": "Wait time before pasting",
   "settings.pasteAfterCopyComment": "Cannot be enabled on Mac as it will crash the application",

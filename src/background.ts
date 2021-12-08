@@ -279,11 +279,9 @@ const copyTextAndPostProcess = (text: string, historyEvent: HistoryEvent) => {
   clipboard.writeText(text);
 
   if (settings.closeAfterCopy) {
-    setTimeout(() => {
-      if (historyWin) {
-        hideWindow('history');
-      }
-    }, rules.closeAfterCopyTimeout.value(settings.closeAfterCopyTimeout));
+    if (historyWin) {
+      hideWindow('history');
+    }
   }
 
   if (!isPastePrevent) {

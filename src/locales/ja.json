@@ -38,7 +38,6 @@
   "settings.shortcutComment": "クリップボード履歴画面を表示するショートカット",
   "settings.preprocessing": "コピー前のテキスト編集処理を設定する",
   "settings.closeAfterCopy": "コピー後にクリップボード履歴画面を閉じる",
-  "settings.closeAfterCopyTimeout": "コピー後にクリップボード履歴画面を閉じるまでの待機時間",
   "settings.pasteAfterCopy": "コピー後に貼り付けを実行する",
   "settings.pasteAfterCopyTimeout": "コピー後に貼り付けを実行するまでの待機時間",
   "settings.pasteAfterCopyComment": "アプリが落ちるため Mac では有効にできません",

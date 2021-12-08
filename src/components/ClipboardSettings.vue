@@ -179,7 +179,7 @@
             </v-col>
           </v-row>
           <v-row align="center">
-            <v-col cols="12" sm="6">
+            <v-col>
               <v-switch
                 hide-details
                 :label="__('settings.closeAfterCopy')"
@@ -187,26 +187,6 @@
                 @change="onClipboardSettingsChange({ closeAfterCopy: $event })"
               >
               </v-switch>
-            </v-col>
-            <v-col cols="12" sm="6">
-              <v-text-field
-                hide-details
-                :label="__('settings.closeAfterCopyTimeout')"
-                :min="rules.closeAfterCopyTimeout.min"
-                :max="rules.closeAfterCopyTimeout.max"
-                :rules="[rules.closeAfterCopyTimeout.rule]"
-                :suffix="__('settings.milliseconds')"
-                type="number"
-                :value="
-                  rules.closeAfterCopyTimeout.value(
-                    settings.closeAfterCopyTimeout
-                  )
-                "
-                @change="
-                  onClipboardSettingsChange({ closeAfterCopyTimeout: +$event })
-                "
-              >
-              </v-text-field>
             </v-col>
           </v-row>
           <v-row align="center">
