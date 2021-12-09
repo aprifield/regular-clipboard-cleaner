@@ -36,7 +36,7 @@ function startMonitoring() {
   if (maxHistoryCount === 0) {
     return setInterval(() => {
       clearClipboard();
-      if (historyItems.length !== 0) {
+      if (historyItems.length) {
         historyItems.length = 0;
         setHistoryItems(historyItems);
         ipcMain.emit('clipboard-history-change', historyItems);
