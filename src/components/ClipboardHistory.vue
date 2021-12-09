@@ -83,6 +83,12 @@ interface TableHistoryItems extends HistoryItem {
   row: number;
 }
 
+interface CopyEventParams {
+  eventName: string;
+  text: string;
+  historyEvent: HistoryEvent;
+}
+
 export default Vue.extend({
   name: 'ClipboardHistory',
 
@@ -101,7 +107,8 @@ export default Vue.extend({
       findTargetTimeoutId: -1,
       historyItemHeight: 40,
       historyContainerHeight: 300,
-      keyboardEvent: undefined as KeyboardEvent | undefined
+      keyboardEvents: [] as KeyboardEvent[],
+      copyEventParams: undefined as CopyEventParams | undefined
     };
   },
 
@@ -135,18 +142,42 @@ export default Vue.extend({
     initStatus() {
       this.search = '';
       this.selectedIndex = -1;
-      this.keyboardEvent = undefined;
+      this.keyboardEvents = [];
+      this.copyEventParams = undefined;
     },
     createHistoryEvent(event: KeyboardEvent | MouseEvent): HistoryEvent {
-      const e = this.keyboardEvent || event;
+      const e = this.keyboardEvents[this.keyboardEvents.length - 1] || event;
       return {
         altKey: e.altKey,
         code: e instanceof KeyboardEvent ? e.code : undefined,
         ctrlKey: e.ctrlKey,
         key: e instanceof KeyboardEvent ? e.key : undefined,
         metaKey: e.metaKey,
-        shiftKey: e.shiftKey
+        shiftKey: e.shiftKey,
+        events: this.keyboardEvents.map(e => ({
+          altKey: e.altKey,
+          code: e.code,
+          ctrlKey: e.ctrlKey,
+          key: e.key,
+          metaKey: e.metaKey,
+          shiftKey: e.shiftKey
+        }))
       };
+    },
+    tryEmitCopyEvent(copyEventParams: CopyEventParams): void {
+      if (this.keyboardEvents.length) {
+        this.copyEventParams = copyEventParams;
+      } else {
+        this.emitCopyEvent(copyEventParams);
+      }
+    },
+    emitCopyEvent(copyEventParams: CopyEventParams): void {
+      this.$emit(
+        copyEventParams.eventName,
+        copyEventParams.text,
+        copyEventParams.historyEvent
+      );
+      this.initStatus();
     },
     async adjustScrollPositionAndFindTargetRow(targetIndex: number) {
       const maxVisibleItemCount = Math.floor(
@@ -201,12 +232,11 @@ export default Vue.extend({
       }, 300);
     },
     onListItemClick(text: string, event: MouseEvent) {
-      this.$emit(
-        'clipboard-list-item-click',
+      this.tryEmitCopyEvent({
+        eventName: 'clipboard-list-item-click',
         text,
-        this.createHistoryEvent(event)
-      );
-      this.initStatus();
+        historyEvent: this.createHistoryEvent(event)
+      });
     },
     onDeleteClick(text: string) {
       this.$emit('clipboard-delete-click', text);
@@ -231,14 +261,17 @@ export default Vue.extend({
       } else if (event.code === 'Enter') {
         event.preventDefault();
         if (this.currentHistoryItems[this.selectedIndex]) {
-          this.$emit(
-            'clipboard-enter-keydown',
-            this.currentHistoryItems[this.selectedIndex].text,
-            this.createHistoryEvent(event)
-          );
-          this.initStatus();
+          this.tryEmitCopyEvent({
+            eventName: 'clipboard-enter-keydown',
+            text: this.currentHistoryItems[this.selectedIndex].text,
+            historyEvent: this.createHistoryEvent(event)
+          });
         }
-      } else if (event.code === 'ArrowDown' || event.code === 'ArrowUp') {
+      } else if (
+        event.code === 'ArrowDown' ||
+        event.code === 'ArrowUp' ||
+        event.code === 'Tab'
+      ) {
         event.preventDefault();
         if (this.findTargetTimeoutId !== -1) {
           return;
@@ -251,7 +284,8 @@ export default Vue.extend({
         }
 
         const targetSelectedIndex =
-          event.code === 'ArrowDown'
+          event.code === 'ArrowDown' ||
+          (event.code === 'Tab' && !event.shiftKey)
             ? this.selectedIndex + 1
             : this.selectedIndex - 1;
 
@@ -266,14 +300,15 @@ export default Vue.extend({
           }
         }
       } else {
-        this.keyboardEvent = event;
+        this.keyboardEvents.push(event);
       }
     },
     onWindowKeyUp(event: KeyboardEvent) {
-      if (this.keyboardEvent) {
-        if (this.keyboardEvent.code === event.code) {
-          this.keyboardEvent = undefined;
-        }
+      this.keyboardEvents = this.keyboardEvents.filter(
+        e => e.code !== event.code
+      );
+      if (!this.keyboardEvents.length && this.copyEventParams) {
+        this.emitCopyEvent(this.copyEventParams);
       }
     },
     onWindowResize() {
