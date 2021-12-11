@@ -95,8 +95,11 @@ export default Vue.extend({
     this.ipcBridge.on('init-settings', (event, args) => {
       this.settings = args;
       this.$vuetify.theme.dark = !!this.settings.darkTheme;
-      if (platform === 'win32') {
-        const html = document.querySelector('html') as HTMLHtmlElement;
+      const html = document.querySelector('html') as HTMLHtmlElement;
+      if (this.mode === 'history') {
+        html.classList.add('overflow-hidden');
+      }
+      if (this.platform === 'win32') {
         if (this.settings.darkTheme) {
           html.classList.remove('webkit-scrollbar--light');
           html.classList.add('webkit-scrollbar--dark');
@@ -120,6 +123,10 @@ export default Vue.extend({
 html {
   overflow: auto;
   user-select: none;
+}
+
+.overflow-hidden {
+  overflow: hidden;
 }
 
 .webkit-scrollbar {
