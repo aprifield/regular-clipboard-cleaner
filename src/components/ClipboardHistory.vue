@@ -24,6 +24,11 @@
           :item-height="historyItemHeight"
         >
           <template v-slot:default="{ item, index }">
+            <!--
+              Don't use mouseenter or mouseover.
+              Scrolling with the arrow keys returns the focus to the line where the cursor was placed.
+              The same problem occurs when closing the screen by clicking on a line.
+            -->
             <v-list-item
               :key="`list-item-${index}`"
               :id="`clipboard-row-${index}`"
@@ -31,7 +36,7 @@
               :class="{ 'v-list-item--active': index === selectedIndex }"
               dense
               @click="onListItemClick(item.text, $event)"
-              @mouseover="selectedIndex = index"
+              @mousemove="selectedIndex = index"
             >
               <v-list-item-icon class="mr-2">
                 <span
