@@ -45,7 +45,6 @@
             </v-col>
             <v-col cols="12" sm="6">
               <v-text-field
-                :disabled="+settings.maxHistoryCount === 0"
                 hide-details
                 :label="__('settings.monitorInterval')"
                 :min="rules.monitorInterval.min"
