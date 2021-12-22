@@ -62,7 +62,10 @@ async function createWindow(mode: 'history' | 'settings') {
   const settings = getSettings();
   // Create the browser window.
   const win = new BrowserWindow({
-    icon: path.join(__static, 'icon.png'),
+    icon: path.join(
+      __static,
+      process.platform === 'win32' ? 'icon.ico' : 'icon-16x16.png'
+    ),
     frame: mode === 'settings' || settings.showFrame,
     maximizable: false,
     show: false,
