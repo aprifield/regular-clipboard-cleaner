@@ -33,12 +33,10 @@ function startMonitoring() {
     clearedTime = new Date().getTime();
   };
 
-  if (maxHistoryCount === 0) {
-    if (historyItems.length) {
-      historyItems.length = 0;
-      setHistoryItems(historyItems);
-      ipcMain.emit('clipboard-history-change', historyItems);
-    }
+  if (maxHistoryCount < historyItems.length) {
+    historyItems.length = maxHistoryCount;
+    setHistoryItems(historyItems);
+    ipcMain.emit('clipboard-history-change', historyItems);
   }
 
   return setInterval(() => {
