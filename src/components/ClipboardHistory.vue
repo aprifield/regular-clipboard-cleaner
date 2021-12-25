@@ -5,6 +5,7 @@
         <v-text-field
           ref="textField"
           append-icon="mdi-magnify"
+          autofocus
           dense
           hide-details
           label="Search"
@@ -122,6 +123,9 @@ export default Vue.extend({
   },
 
   computed: {
+    maxVisibleItemCount(): number {
+      return Math.floor(this.historyContainerHeight / this.historyItemHeight);
+    },
     tableHistoryItems(): TableHistoryItems[] {
       return this.historyItems.map((item, index) => {
         return { ...item, index, row: index + 1 };
@@ -167,13 +171,13 @@ export default Vue.extend({
           key: event.key,
           metaKey: event.metaKey,
           shiftKey: event.shiftKey,
-          events: this.keyboardEvents.map(event => ({
-            altKey: event.altKey,
-            code: event.code,
-            ctrlKey: event.ctrlKey,
-            key: event.key,
-            metaKey: event.metaKey,
-            shiftKey: event.shiftKey
+          events: this.keyboardEvents.map(e => ({
+            altKey: e.altKey,
+            code: e.code,
+            ctrlKey: e.ctrlKey,
+            key: e.key,
+            metaKey: e.metaKey,
+            shiftKey: e.shiftKey
           }))
         };
       } else {
@@ -204,18 +208,14 @@ export default Vue.extend({
       this.initStatus();
     },
     async adjustScrollPositionAndFindTargetRow(targetIndex: number) {
-      const maxVisibleItemCount = Math.floor(
-        this.historyContainerHeight / this.historyItemHeight
-      );
-
       const offset =
-        this.historyItemHeight * (maxVisibleItemCount + 1) -
+        this.historyItemHeight * (this.maxVisibleItemCount + 1) -
         this.historyContainerHeight;
 
       const visibleScrollRange = [
-        targetIndex < maxVisibleItemCount
+        targetIndex < this.maxVisibleItemCount
           ? 0
-          : (targetIndex - maxVisibleItemCount) * this.historyItemHeight +
+          : (targetIndex - this.maxVisibleItemCount) * this.historyItemHeight +
             offset,
         targetIndex * this.historyItemHeight
       ];
@@ -292,8 +292,12 @@ export default Vue.extend({
           ) as HTMLInputElement).focus();
         }
       } else if (
-        event.code === 'ArrowDown' ||
+        event.code === 'Home' ||
+        event.code === 'End' ||
+        event.code === 'PageUp' ||
+        event.code === 'PageDown' ||
         event.code === 'ArrowUp' ||
+        event.code === 'ArrowDown' ||
         event.code === 'Tab'
       ) {
         event.preventDefault();
@@ -301,12 +305,29 @@ export default Vue.extend({
           return;
         }
 
-        const targetSelectedIndex =
-          event.code === 'ArrowDown' ||
-          (event.code === 'Tab' && !event.shiftKey)
-            ? this.selectedIndex + 1
-            : this.selectedIndex - 1;
-
+        let targetSelectedIndex = -1;
+        if (event.code === 'Home' || event.code === 'End') {
+          targetSelectedIndex =
+            event.code === 'Home' ? 0 : this.currentHistoryItems.length - 1;
+        } else if (event.code === 'PageUp' || event.code === 'PageDown') {
+          targetSelectedIndex =
+            (this.selectedIndex === -1 ? 0 : this.selectedIndex) +
+            (event.code === 'PageUp'
+              ? -this.maxVisibleItemCount
+              : this.maxVisibleItemCount);
+          if (!this.currentHistoryItems[targetSelectedIndex]) {
+            targetSelectedIndex =
+              event.code === 'PageUp' ? 0 : this.currentHistoryItems.length - 1;
+          }
+        } else {
+          targetSelectedIndex =
+            event.code === 'ArrowUp' || (event.code === 'Tab' && event.shiftKey)
+              ? this.selectedIndex - 1
+              : this.selectedIndex + 1;
+          if (targetSelectedIndex === -1) {
+            this.selectedIndex = -1;
+          }
+        }
         if (this.currentHistoryItems[targetSelectedIndex]) {
           const targetSelectedRow = await this.adjustScrollPositionAndFindTargetRow(
             targetSelectedIndex
@@ -357,10 +378,18 @@ export default Vue.extend({
       }
     },
     selectedIndex() {
-      if (this.isTextFieldFocused) {
-        ((this.$refs.textField as Vue).$el.querySelector(
-          'input'
-        ) as HTMLInputElement).blur();
+      if (this.selectedIndex === -1) {
+        if (!this.isTextFieldFocused) {
+          ((this.$refs.textField as Vue).$el.querySelector(
+            'input'
+          ) as HTMLInputElement).focus();
+        }
+      } else {
+        if (this.isTextFieldFocused) {
+          ((this.$refs.textField as Vue).$el.querySelector(
+            'input'
+          ) as HTMLInputElement).blur();
+        }
       }
     }
   },
