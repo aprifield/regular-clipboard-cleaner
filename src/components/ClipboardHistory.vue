@@ -35,7 +35,7 @@
               class="v-list-item--link primary--text"
               :class="{ 'v-list-item--active': index === selectedIndex }"
               dense
-              @click="onListItemClick(item.text, $event)"
+              @click="onListItemClick(item.text)"
               @mousemove="selectedIndex = index"
             >
               <v-list-item-icon class="mr-2">
@@ -52,6 +52,8 @@
                     :text="item.text"
                     :time="item.time"
                     :tooltip="index === selectedIndex"
+                    :historyEvent="tooltipHistoryEvent"
+                    :settings="settings"
                   />
                 </v-list-item-title>
               </v-list-item-content>
@@ -81,6 +83,7 @@
 import Vue, { PropType } from 'vue';
 import { HistoryItem } from '@/types/history-item';
 import { HistoryEvent } from '@/types/history-event';
+import { Settings } from '@/types/settings';
 import ClipboardHistoryText from '@/components/ClipboardHistoryText.vue';
 
 interface TableHistoryItems extends HistoryItem {
@@ -100,7 +103,8 @@ export default Vue.extend({
   components: { ClipboardHistoryText },
 
   props: {
-    historyItems: { type: Array as PropType<HistoryItem[]>, default: () => [] }
+    historyItems: { type: Array as PropType<HistoryItem[]>, required: true },
+    settings: { type: Object as PropType<Settings>, required: true }
   },
 
   data() {
@@ -140,6 +144,9 @@ export default Vue.extend({
       } else {
         return this.tableHistoryItems;
       }
+    },
+    tooltipHistoryEvent(): HistoryEvent {
+      return this.createHistoryEvent();
     }
   },
 
@@ -150,24 +157,36 @@ export default Vue.extend({
       this.keyboardEvents = [];
       this.copyEventParams = undefined;
     },
-    createHistoryEvent(event: KeyboardEvent | MouseEvent): HistoryEvent {
-      const e = this.keyboardEvents[this.keyboardEvents.length - 1] || event;
-      return {
-        altKey: e.altKey,
-        code: e instanceof KeyboardEvent ? e.code : undefined,
-        ctrlKey: e.ctrlKey,
-        key: e instanceof KeyboardEvent ? e.key : undefined,
-        metaKey: e.metaKey,
-        shiftKey: e.shiftKey,
-        events: this.keyboardEvents.map(e => ({
-          altKey: e.altKey,
-          code: e.code,
-          ctrlKey: e.ctrlKey,
-          key: e.key,
-          metaKey: e.metaKey,
-          shiftKey: e.shiftKey
-        }))
-      };
+    createHistoryEvent(): HistoryEvent {
+      const event = this.keyboardEvents[this.keyboardEvents.length - 1];
+      if (event) {
+        return {
+          altKey: event.altKey,
+          code: event.code,
+          ctrlKey: event.ctrlKey,
+          key: event.key,
+          metaKey: event.metaKey,
+          shiftKey: event.shiftKey,
+          events: this.keyboardEvents.map(event => ({
+            altKey: event.altKey,
+            code: event.code,
+            ctrlKey: event.ctrlKey,
+            key: event.key,
+            metaKey: event.metaKey,
+            shiftKey: event.shiftKey
+          }))
+        };
+      } else {
+        return {
+          altKey: false,
+          code: undefined,
+          ctrlKey: false,
+          key: undefined,
+          metaKey: false,
+          shiftKey: false,
+          events: []
+        };
+      }
     },
     tryEmitCopyEvent(copyEventParams: CopyEventParams): void {
       if (this.keyboardEvents.length) {
@@ -236,11 +255,11 @@ export default Vue.extend({
         this.selectedIndex = -1;
       }, 300);
     },
-    onListItemClick(text: string, event: MouseEvent) {
+    onListItemClick(text: string) {
       this.tryEmitCopyEvent({
         eventName: 'clipboard-list-item-click',
         text,
-        historyEvent: this.createHistoryEvent(event)
+        historyEvent: this.createHistoryEvent()
       });
     },
     onDeleteClick(text: string) {
@@ -269,7 +288,7 @@ export default Vue.extend({
           this.tryEmitCopyEvent({
             eventName: 'clipboard-enter-keydown',
             text: this.currentHistoryItems[this.selectedIndex].text,
-            historyEvent: this.createHistoryEvent(event)
+            historyEvent: this.createHistoryEvent()
           });
         }
       } else if (
@@ -280,12 +299,6 @@ export default Vue.extend({
         event.preventDefault();
         if (this.findTargetTimeoutId !== -1) {
           return;
-        }
-
-        if (this.isTextFieldFocused) {
-          ((this.$refs.textField as Vue).$el.querySelector(
-            'input'
-          ) as HTMLInputElement).blur();
         }
 
         const targetSelectedIndex =
@@ -305,7 +318,9 @@ export default Vue.extend({
           }
         }
       } else {
-        this.keyboardEvents.push(event);
+        if (!this.keyboardEvents.some(e => e.code == event.code)) {
+          this.keyboardEvents.push(event);
+        }
       }
     },
     onWindowKeyUp(event: KeyboardEvent) {
@@ -339,6 +354,13 @@ export default Vue.extend({
         (this.$refs.historyList as Vue).$el.classList.remove(
           'scroll-behavior-smooth'
         );
+      }
+    },
+    selectedIndex() {
+      if (this.isTextFieldFocused) {
+        ((this.$refs.textField as Vue).$el.querySelector(
+          'input'
+        ) as HTMLInputElement).blur();
       }
     }
   },

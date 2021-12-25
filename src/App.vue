@@ -11,6 +11,7 @@
       <ClipboardHistory
         v-else
         :historyItems="historyItems"
+        :settings="settings"
         @clipboard-list-item-click="onClipboardListItemClick"
         @clipboard-delete-click="onClipboardDeleteClick"
         @clipboard-enter-keydown="onClipboardEnterKeyDown"
@@ -120,9 +121,12 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
+* {
+  user-select: none;
+}
+
 html {
   overflow: auto;
-  user-select: none;
 }
 
 .overflow-hidden {
