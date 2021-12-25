@@ -7,7 +7,7 @@
           append-icon="mdi-magnify"
           dense
           hide-details
-          label="Search (press /)"
+          label="Search"
           single-line
           :value="search"
           @input="onSearchInput"
@@ -275,13 +275,6 @@ export default Vue.extend({
         event.preventDefault();
         this.$emit('clipboard-escape-keydown');
         this.initStatus();
-      } else if (event.code === 'Slash') {
-        if (!this.isTextFieldFocused) {
-          event.preventDefault();
-          ((this.$refs.textField as Vue).$el.querySelector(
-            'input'
-          ) as HTMLInputElement).focus();
-        }
       } else if (event.code === 'Enter') {
         event.preventDefault();
         if (this.currentHistoryItems[this.selectedIndex]) {
@@ -290,6 +283,13 @@ export default Vue.extend({
             text: this.currentHistoryItems[this.selectedIndex].text,
             historyEvent: this.createHistoryEvent()
           });
+        }
+      } else if (event.code === 'KeyF' && (event.ctrlKey || event.metaKey)) {
+        if (!this.isTextFieldFocused) {
+          event.preventDefault();
+          ((this.$refs.textField as Vue).$el.querySelector(
+            'input'
+          ) as HTMLInputElement).focus();
         }
       } else if (
         event.code === 'ArrowDown' ||
