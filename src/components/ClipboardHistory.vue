@@ -39,7 +39,7 @@
               @click="onListItemClick(item.text)"
               @mousemove="selectedIndex = index"
             >
-              <v-list-item-icon class="mr-2">
+              <v-list-item-icon class="history-row">
                 <span
                   class="text-right secondary--text"
                   :style="{ 'min-width': '16px' }"
@@ -47,7 +47,7 @@
                   {{ item.row }}
                 </span>
               </v-list-item-icon>
-              <v-list-item-content>
+              <v-list-item-content class="history-text">
                 <v-list-item-title>
                   <ClipboardHistoryText
                     :text="item.text"
@@ -58,7 +58,7 @@
                   />
                 </v-list-item-title>
               </v-list-item-content>
-              <v-list-item-icon class="action-button" title="Delete">
+              <v-list-item-icon class="history-action" title="Delete">
                 <v-btn
                   icon
                   small
@@ -115,7 +115,7 @@ export default Vue.extend({
       selectedIndex: -1,
       searchTimeoutId: -1,
       findTargetTimeoutId: -1,
-      historyItemHeight: 40,
+      historyItemHeight: 32,
       historyContainerHeight: 300,
       keyboardEvents: [] as KeyboardEvent[],
       copyEventParams: undefined as CopyEventParams | undefined
@@ -410,20 +410,31 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-.v-card__text {
-  height: calc(100vh - 62px);
+.v-card__title {
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
-.v-list-item--link {
-  cursor: pointer;
-  -webkit-user-select: auto;
-  -moz-user-select: auto;
-  -ms-user-select: auto;
-  user-select: auto;
-  .action-button {
+.v-card__text {
+  height: calc(100vh - 46px);
+}
+.v-list-item {
+  min-height: 32px;
+  .history-text {
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+  .history-row {
+    margin-top: 5px !important;
+    margin-bottom: 3px !important;
+    margin-right: 8px !important;
+  }
+  .history-action {
     display: none;
+    margin-top: 3px !important;
+    margin-bottom: 5px !important;
   }
   &:hover {
-    .action-button {
+    .history-action {
       display: inline-flex;
     }
   }
