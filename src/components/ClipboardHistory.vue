@@ -61,7 +61,7 @@
               <v-list-item-icon class="history-action" title="Delete">
                 <v-btn
                   icon
-                  small
+                  x-small
                   @click.stop="onDeleteClick(item.text)"
                   @mousedown.stop
                 >
@@ -430,8 +430,8 @@ export default Vue.extend({
   }
   .history-action {
     display: none;
-    margin-top: 3px !important;
-    margin-bottom: 5px !important;
+    margin-top: 5px !important;
+    margin-bottom: 3px !important;
   }
   &:hover {
     .history-action {
