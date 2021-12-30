@@ -359,6 +359,9 @@ export default Vue.extend({
       this.historyContainerHeight = historyContainer
         ? historyContainer.clientHeight
         : 300;
+    },
+    onWindowBlur() {
+      this.keyboardEvents = [];
     }
   },
 
@@ -398,6 +401,7 @@ export default Vue.extend({
     window.addEventListener('keydown', this.onWindowKeyDown);
     window.addEventListener('keyup', this.onWindowKeyUp);
     window.addEventListener('resize', this.onWindowResize);
+    window.addEventListener('blur', this.onWindowBlur);
     this.onWindowResize();
   },
 
@@ -405,6 +409,7 @@ export default Vue.extend({
     window.removeEventListener('keydown', this.onWindowKeyDown);
     window.removeEventListener('keyup', this.onWindowKeyUp);
     window.removeEventListener('resize', this.onWindowResize);
+    window.removeEventListener('blur', this.onWindowBlur);
   }
 });
 </script>
