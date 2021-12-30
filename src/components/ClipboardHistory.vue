@@ -192,6 +192,20 @@ export default Vue.extend({
         };
       }
     },
+    focusInTextField(): void {
+      if (!this.isTextFieldFocused) {
+        ((this.$refs.textField as Vue).$el.querySelector(
+          'input'
+        ) as HTMLInputElement).focus();
+      }
+    },
+    focusOutTextField(): void {
+      if (this.isTextFieldFocused) {
+        ((this.$refs.textField as Vue).$el.querySelector(
+          'input'
+        ) as HTMLInputElement).blur();
+      }
+    },
     tryEmitCopyEvent(copyEventParams: CopyEventParams): void {
       if (this.keyboardEvents.length) {
         this.copyEventParams = copyEventParams;
@@ -285,12 +299,9 @@ export default Vue.extend({
           });
         }
       } else if (event.code === 'KeyF' && (event.ctrlKey || event.metaKey)) {
-        if (!this.isTextFieldFocused) {
-          event.preventDefault();
-          ((this.$refs.textField as Vue).$el.querySelector(
-            'input'
-          ) as HTMLInputElement).focus();
-        }
+        event.preventDefault();
+        this.focusInTextField();
+        this.selectedIndex = -1;
       } else if (
         event.code === 'Home' ||
         event.code === 'End' ||
@@ -325,6 +336,7 @@ export default Vue.extend({
               ? this.selectedIndex - 1
               : this.selectedIndex + 1;
           if (targetSelectedIndex === -1) {
+            this.focusInTextField();
             this.selectedIndex = -1;
           }
         }
@@ -381,18 +393,8 @@ export default Vue.extend({
       }
     },
     selectedIndex() {
-      if (this.selectedIndex === -1) {
-        if (!this.isTextFieldFocused) {
-          ((this.$refs.textField as Vue).$el.querySelector(
-            'input'
-          ) as HTMLInputElement).focus();
-        }
-      } else {
-        if (this.isTextFieldFocused) {
-          ((this.$refs.textField as Vue).$el.querySelector(
-            'input'
-          ) as HTMLInputElement).blur();
-        }
+      if (this.selectedIndex !== -1) {
+        this.focusOutTextField();
       }
     }
   },
