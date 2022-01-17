@@ -1,4 +1,4 @@
-import { app, Menu, Tray, nativeImage, ipcMain } from 'electron';
+import { app, Menu, Tray, ipcMain } from 'electron';
 import path from 'path';
 import { loadDictionary, translate as __ } from '@/util/i18n';
 
