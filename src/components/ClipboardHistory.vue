@@ -53,6 +53,9 @@
                     :text="item.text"
                     :time="item.time"
                     :tooltip="index === selectedIndex"
+                    :tooltipLineCount="
+                      Math.floor((maxVisibleItemCount * 2) / 3)
+                    "
                     :historyEvent="tooltipHistoryEvent"
                     :settings="settings"
                   />

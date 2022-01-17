@@ -9,12 +9,39 @@
     <template v-slot:activator="{ attrs }">
       <span v-bind="attrs">{{ text }}</span>
     </template>
-    <span class="tooltip-caption">
+    <div class="tooltip-caption">
       {{ new Date(time).toLocaleString() }}
       {{ historyEvent.events.map(e => `[${e.code}]`).join('') }}
-    </span>
-    <v-divider class="my-2" />
-    <span class="tooltip-text">{{ tooltipText }}</span>
+    </div>
+    <v-divider class="my-1" />
+    <div class="tooltip-text">
+      <div
+        v-for="(text, row) in tooltipTexts"
+        :key="`row-${row}`"
+        class="tooltip-line"
+      >
+        <template v-if="row < tooltipLineCount">
+          <template v-for="(char, col) in text">
+            <span
+              v-if="char === ' ' || char === '\t'"
+              :key="`row-${row}-col-${col}`"
+              class="tooltip-white-space"
+              >{{ char === ' ' ? space : tab }}</span
+            >
+            <template v-else>{{ char }}</template>
+          </template>
+          <v-icon
+            v-if="row < tooltipTexts.length - 1"
+            class="tooltip-icon-return"
+          >
+            mdi-keyboard-return
+          </v-icon>
+        </template>
+        <v-icon v-else class="tooltip-icon-dots">
+          mdi-dots-horizontal
+        </v-icon>
+      </div>
+    </div>
   </v-tooltip>
 </template>
 
@@ -31,12 +58,15 @@ export default Vue.extend({
     text: { type: String, required: true },
     time: { type: Number, required: true },
     tooltip: { type: Boolean, required: true },
+    tooltipLineCount: { type: Number, required: true },
     historyEvent: { type: Object as PropType<HistoryEvent>, required: true },
     settings: { type: Object as PropType<Settings>, required: true }
   },
 
   data() {
     return {
+      space: '·',
+      tab: '→   ',
       isTooltipVisible: false,
       tooltipTimeoutId: -1
     };
@@ -55,6 +85,9 @@ export default Vue.extend({
       } catch (e) {
         return e + '';
       }
+    },
+    tooltipTexts(): string[] {
+      return this.tooltipText.split(/\r\n|\r|\n/, this.tooltipLineCount + 1);
     }
   },
 
@@ -81,9 +114,30 @@ export default Vue.extend({
   overflow: hidden;
 }
 .tooltip-caption {
-  zoom: 0.8;
+  font-size: 12px;
 }
 .tooltip-text {
-  white-space: pre-wrap;
+  font-family: Consolas, 'Courier New', 'Roboto', sans-serif;
+  font-size: 12px;
+  .tooltip-line {
+    line-height: 18px;
+    overflow-wrap: break-word;
+  }
+  .tooltip-white-space {
+    opacity: 0.4;
+    white-space: pre;
+  }
+  .tooltip-icon-return {
+    color: #fff;
+    font-size: 10px;
+    margin-top: -1px;
+    margin-left: 1px;
+    opacity: 0.8;
+  }
+  .tooltip-icon-dots {
+    color: #fff;
+    font-size: 14px;
+    opacity: 0.8;
+  }
 }
 </style>
