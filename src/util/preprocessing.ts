@@ -18,8 +18,6 @@ const dummy = (text: string, event: PreprocessingHistoryEvent) => {
       : map(text, 0, [text]);
   };
 
-  text = text.replaceAll('Javascript', 'JavaScript');
-
   if (event.ctrlKey) {
     event.preventPaste(); // Call this if you don't want to paste.
   }
@@ -37,13 +35,13 @@ const dummy = (text: string, event: PreprocessingHistoryEvent) => {
     return event.key === 'S' ? text.toUpperCase() : text;
   }
   if (event.key === 'q' || event.shiftKey) {
-    return addPrefix('> '); // Add quote
+    return addPrefix('> '); // Add quote mark
+  }
+  if (event.key === '/') {
+    return addPrefix('// '); // Comment out
   }
   if (event.key && 1 <= +event.key && +event.key <= 9) {
     return addPrefix(+event.key); // Add line number
-  }
-  if (event.key === 'd') {
-    return JSON.stringify({ event, text }); // For debug
   }
   return text;
 };
@@ -65,8 +63,6 @@ export default String.raw`(text: string, event: PreprocessingHistoryEvent) => {
       : map(text, 0, [text]);
   };
 
-  text = text.replaceAll('Javascript', 'JavaScript');
-
   if (event.ctrlKey) {
     event.preventPaste(); // Call this if you don't want to paste.
   }
@@ -84,13 +80,13 @@ export default String.raw`(text: string, event: PreprocessingHistoryEvent) => {
     return event.key === 'S' ? text.toUpperCase() : text;
   }
   if (event.key === 'q' || event.shiftKey) {
-    return addPrefix('> '); // Add quote
+    return addPrefix('> '); // Add quote mark
+  }
+  if (event.key === '/') {
+    return addPrefix('// '); // Comment out
   }
   if (event.key && 1 <= +event.key && +event.key <= 9) {
     return addPrefix(+event.key); // Add line number
-  }
-  if (event.key === 'd') {
-    return JSON.stringify({ event, text }); // For debug
   }
   return text;
 }`
