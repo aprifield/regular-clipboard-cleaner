@@ -314,6 +314,13 @@ export default Vue.extend({
         event.code === 'ArrowDown' ||
         event.code === 'Tab'
       ) {
+        if (
+          (event.code === 'Home' || event.code === 'End') &&
+          this.isTextFieldFocused
+        ) {
+          return;
+        }
+
         event.preventDefault();
         if (this.findTargetTimeoutId !== -1) {
           return;
