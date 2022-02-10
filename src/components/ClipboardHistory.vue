@@ -37,9 +37,11 @@
               :class="{ 'v-list-item--active': index === selectedIndex }"
               dense
               @click="onListItemClick(item.text)"
-              @mousemove="selectedIndex = index"
             >
-              <v-list-item-icon class="history-row">
+              <v-list-item-icon
+                class="history-row"
+                @mousemove="selectedIndex = index"
+              >
                 <span
                   class="text-right secondary--text"
                   :style="{ 'min-width': '16px' }"
@@ -47,7 +49,10 @@
                   {{ item.row }}
                 </span>
               </v-list-item-icon>
-              <v-list-item-content class="history-text">
+              <v-list-item-content
+                class="history-text"
+                @mousemove="selectedIndex = index"
+              >
                 <v-list-item-title>
                   <ClipboardHistoryText
                     :text="item.text"
@@ -61,7 +66,11 @@
                   />
                 </v-list-item-title>
               </v-list-item-content>
-              <v-list-item-icon class="history-action" title="Delete">
+              <v-list-item-icon
+                class="history-action"
+                title="Delete"
+                @mousemove="selectedIndex = index"
+              >
                 <v-btn
                   icon
                   x-small
