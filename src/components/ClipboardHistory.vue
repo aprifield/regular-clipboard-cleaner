@@ -5,7 +5,6 @@
         <v-text-field
           ref="textField"
           append-icon="mdi-magnify"
-          autofocus
           dense
           hide-details
           label="Search"
@@ -354,7 +353,7 @@ export default Vue.extend({
             event.code === 'ArrowUp' || (event.code === 'Tab' && event.shiftKey)
               ? this.selectedIndex - 1
               : this.selectedIndex + 1;
-          if (targetSelectedIndex === -1) {
+          if (this.selectedIndex === -1 || targetSelectedIndex === -1) {
             this.focusInTextField();
             this.selectedIndex = -1;
           }
