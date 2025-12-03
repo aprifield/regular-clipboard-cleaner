@@ -1,3 +1,6 @@
+import en from '@/locales/en';
+import ja from '@/locales/ja';
+
 let dictionary: { [key: string]: string };
 
 export function loadDictionary(locale = 'en') {
@@ -5,11 +8,7 @@ export function loadDictionary(locale = 'en') {
     return;
   }
 
-  try {
-    dictionary = require(`@/locales/${locale}.json`);
-  } catch {
-    dictionary = require(`@/locales/en.json`);
-  }
+  dictionary = locale === 'ja' ? ja : en;
 }
 
 export function translate(key: string, ...params: string[]) {

@@ -1,6 +1,11 @@
-import { PreprocessingHistoryEvent } from '@/types/history-event';
+import type { PreprocessingHistoryEvent } from '@/types/history-event';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+/* eslint-disable @stylistic/indent */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable antfu/top-level-function */
+/* eslint-disable unicorn/no-nested-ternary */
+/* eslint-disable unicorn/no-array-callback-reference */
+// @ts-ignore
 const dummy = (text: string, event: PreprocessingHistoryEvent) => {
   const addPrefix = (prefix: string | number) => {
     const map = (str: string, index: number, lines: string[]) =>
@@ -11,10 +16,7 @@ const dummy = (text: string, event: PreprocessingHistoryEvent) => {
         : prefix + str;
     const eol = text.match(/\r\n|\n|\r/);
     return eol
-      ? text
-          .split(eol[0])
-          .map(map)
-          .join(eol[0])
+      ? text.split(eol[0]).map(map).join(eol[0])
       : map(text, 0, [text]);
   };
 
@@ -31,7 +33,7 @@ const dummy = (text: string, event: PreprocessingHistoryEvent) => {
     return text.replace(/_(.)/g, (match, p1) => p1.toUpperCase()); // To camelCase
   }
   if (event.key === 's' || event.key === 'S') {
-    text = text.replace(/([A-Z])/g, match => '_' + match.toLowerCase()); // To snake_case
+    text = text.replace(/([A-Z])/g, (match) => '_' + match.toLowerCase()); // To snake_case
     return event.key === 'S' ? text.toUpperCase() : text;
   }
   if (event.key === 'q' || event.shiftKey) {
@@ -45,6 +47,11 @@ const dummy = (text: string, event: PreprocessingHistoryEvent) => {
   }
   return text;
 };
+/* eslint-enable unicorn/no-array-callback-reference */
+/* eslint-enable unicorn/no-nested-ternary */
+/* eslint-enable antfu/top-level-function */
+/* eslint-enable @typescript-eslint/no-unused-vars */
+/* eslint-enable @stylistic/indent */
 
 export default String.raw`(text: string, event: PreprocessingHistoryEvent) => {
   const addPrefix = (prefix: string | number) => {
@@ -56,10 +63,7 @@ export default String.raw`(text: string, event: PreprocessingHistoryEvent) => {
         : prefix + str;
     const eol = text.match(/\r\n|\n|\r/);
     return eol
-      ? text
-          .split(eol[0])
-          .map(map)
-          .join(eol[0])
+      ? text.split(eol[0]).map(map).join(eol[0])
       : map(text, 0, [text]);
   };
 
@@ -76,7 +80,7 @@ export default String.raw`(text: string, event: PreprocessingHistoryEvent) => {
     return text.replace(/_(.)/g, (match, p1) => p1.toUpperCase()); // To camelCase
   }
   if (event.key === 's' || event.key === 'S') {
-    text = text.replace(/([A-Z])/g, match => '_' + match.toLowerCase()); // To snake_case
+    text = text.replace(/([A-Z])/g, (match) => '_' + match.toLowerCase()); // To snake_case
     return event.key === 'S' ? text.toUpperCase() : text;
   }
   if (event.key === 'q' || event.shiftKey) {

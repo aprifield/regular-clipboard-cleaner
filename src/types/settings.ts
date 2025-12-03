@@ -1,4 +1,4 @@
-import { Rectangle } from 'electron';
+import type { Rectangle } from 'electron';
 
 export interface Settings {
   startAtLogin?: boolean;

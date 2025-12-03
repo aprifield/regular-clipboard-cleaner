@@ -19,19 +19,13 @@ npm install
 ### Start a development server
 
 ```
-npm run electron:serve
+npm run dev
 ```
 
 ### Build an application
 
 ```
-npm run electron:build
-```
-
-### Lints and fixes files
-
-```
-npm run lint
+npm run build
 ```
 
 ## License

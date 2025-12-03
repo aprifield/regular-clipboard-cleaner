@@ -1,3 +1,89 @@
+<script setup lang="ts">
+import type { HistoryEvent } from '@/types/history-event';
+import type { HistoryItem } from '@/types/history-item';
+import type { Settings } from '@/types/settings';
+import { onMounted, ref } from 'vue';
+import { useTheme } from 'vuetify';
+import ClipboardHistory from '@/components/ClipboardHistory.vue';
+import ClipboardSettings from '@/components/ClipboardSettings.vue';
+
+const theme = useTheme();
+const mode = ref('history');
+const locale = ref('en');
+const platform = ref('win32');
+const historyItems = ref<HistoryItem[]>([]);
+const settings = ref<Settings>({});
+
+function cloneDeep(obj: any) {
+  return JSON.parse(JSON.stringify(obj));
+}
+
+function onClipboardListItemClick(value: {
+  text: string;
+  historyEvent: HistoryEvent;
+}) {
+  window.ipcBridge.send('web:click:list-item', cloneDeep(value));
+}
+
+function onClipboardPinClick(text: string) {
+  window.ipcBridge.send('web:click:pin', { text });
+}
+
+function onClipboardDeleteClick(text: string) {
+  window.ipcBridge.send('web:click:delete', { text });
+}
+
+function onClipboardEnterKeyDown(value: {
+  text: string;
+  historyEvent: HistoryEvent;
+}) {
+  window.ipcBridge.send('web:keydown:enter', cloneDeep(value));
+}
+
+function onClipboardEscapeKeyDown() {
+  window.ipcBridge.send('web:keydown:escape');
+}
+
+function onClipboardSettingsChange(settings: Settings) {
+  window.ipcBridge.send('web:change:settings', cloneDeep({ settings }));
+}
+
+onMounted(() => {
+  window.ipcBridge.send('web:mounted', {
+    mode: mode.value,
+  });
+});
+
+(() => {
+  const searchParams = new URL(window.location.href).searchParams;
+  mode.value = searchParams.get('mode') || 'history';
+  locale.value = searchParams.get('locale') || 'en';
+  platform.value = searchParams.get('platform') || 'win32';
+
+  window.ipcBridge.send('web:created');
+  window.ipcBridge.on('native:init:history', (event, args) => {
+    historyItems.value = args;
+  });
+  window.ipcBridge.on('native:init:settings', (event, args) => {
+    settings.value = args;
+    theme.change(settings.value.darkTheme ? 'dark' : 'light');
+    const html = document.querySelector('html') as HTMLHtmlElement;
+    if (mode.value === 'history') {
+      html.classList.add('overflow-hidden');
+    }
+    if (platform.value === 'win32') {
+      if (settings.value.darkTheme) {
+        html.classList.remove('webkit-scrollbar--light');
+        html.classList.add('webkit-scrollbar--dark');
+      } else {
+        html.classList.remove('webkit-scrollbar--dark');
+        html.classList.add('webkit-scrollbar--light');
+      }
+    }
+  });
+})();
+</script>
+
 <template>
   <v-app>
     <v-main>
@@ -6,119 +92,21 @@
         :locale="locale"
         :platform="platform"
         :settings="settings"
-        @clipboard-settings-change="onClipboardSettingsChange"
+        @change:clipboard-settings="onClipboardSettingsChange"
       />
       <ClipboardHistory
         v-else
-        :historyItems="historyItems"
+        :history-items="historyItems"
         :settings="settings"
-        @clipboard-list-item-click="onClipboardListItemClick"
-        @clipboard-delete-click="onClipboardDeleteClick"
-        @clipboard-enter-keydown="onClipboardEnterKeyDown"
-        @clipboard-escape-keydown="onClipboardEscapeKeyDown"
+        @click:clipboard-delete="onClipboardDeleteClick"
+        @click:clipboard-list-item="onClipboardListItemClick"
+        @click:clipboard-pin="onClipboardPinClick"
+        @keydown:clipboard-enter="onClipboardEnterKeyDown"
+        @keydown:clipboard-escape="onClipboardEscapeKeyDown"
       />
     </v-main>
   </v-app>
 </template>
-
-<script lang="ts">
-import Vue from 'vue';
-import { HistoryItem } from '@/types/history-item';
-import { HistoryEvent } from '@/types/history-event';
-import { Settings } from '@/types/settings';
-import ClipboardHistory from '@/components/ClipboardHistory.vue';
-import ClipboardSettings from '@/components/ClipboardSettings.vue';
-
-export default Vue.extend({
-  name: 'App',
-
-  components: { ClipboardHistory, ClipboardSettings },
-
-  data() {
-    return {
-      mode: 'history',
-      locale: 'en',
-      platform: 'win32',
-      historyItems: [] as HistoryItem[],
-      settings: {} as Settings
-    };
-  },
-
-  computed: {
-    ipcBridge() {
-      const ipcBridge = ((window as unknown) as {
-        ipcBridge: {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          send(channel: string, ...args: any[]): void;
-          on(
-            channel: string,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            listener: (event: any, ...args: any[]) => void
-          ): void;
-        };
-      }).ipcBridge;
-      return ipcBridge;
-    }
-  },
-
-  methods: {
-    onClipboardListItemClick(text: string, event: HistoryEvent) {
-      this.ipcBridge.send('web-list-item-click', text, event);
-    },
-    onClipboardDeleteClick(text: string) {
-      this.ipcBridge.send('web-delete-click', text);
-    },
-    onClipboardEnterKeyDown(text: string, event: HistoryEvent) {
-      this.ipcBridge.send('web-enter-keydown', text, event);
-    },
-    onClipboardEscapeKeyDown() {
-      this.ipcBridge.send('web-escape-keydown');
-    },
-    onClipboardSettingsChange(settings: Settings) {
-      this.ipcBridge.send('web-settings-change', settings);
-    }
-  },
-
-  created() {
-    const searchParams = new URL(window.location.href).searchParams;
-    const mode = searchParams.get('mode') || 'history';
-    const locale = searchParams.get('locale') || 'en';
-    const platform = searchParams.get('platform') || 'win32';
-
-    this.mode = mode;
-    this.locale = locale;
-    this.platform = platform;
-
-    this.ipcBridge.send('web-app-created');
-    this.ipcBridge.on('init-history', (event, args) => {
-      this.historyItems = args;
-    });
-    this.ipcBridge.on('init-settings', (event, args) => {
-      this.settings = args;
-      this.$vuetify.theme.dark = !!this.settings.darkTheme;
-      const html = document.querySelector('html') as HTMLHtmlElement;
-      if (this.mode === 'history') {
-        html.classList.add('overflow-hidden');
-      }
-      if (this.platform === 'win32') {
-        if (this.settings.darkTheme) {
-          html.classList.remove('webkit-scrollbar--light');
-          html.classList.add('webkit-scrollbar--dark');
-        } else {
-          html.classList.remove('webkit-scrollbar--dark');
-          html.classList.add('webkit-scrollbar--light');
-        }
-      }
-    });
-  },
-
-  mounted() {
-    this.ipcBridge.send('web-app-mounted', {
-      mode: this.mode
-    });
-  }
-});
-</script>
 
 <style lang="scss">
 * {
@@ -139,27 +127,34 @@ html {
       width: 12px;
       height: 10px;
     }
+
     ::-webkit-scrollbar-track {
       background: rgb(30, 30, 30);
     }
+
     ::-webkit-scrollbar-thumb {
       background: rgb(66, 66, 66);
     }
+
     ::-webkit-scrollbar-thumb:hover {
       background: rgba(79, 79, 79);
     }
   }
+
   &--light {
     ::-webkit-scrollbar {
       width: 12px;
       height: 10px;
     }
+
     ::-webkit-scrollbar-track {
       background: rgb(241, 241, 241);
     }
+
     ::-webkit-scrollbar-thumb {
       background: rgb(192, 192, 192);
     }
+
     ::-webkit-scrollbar-thumb:hover {
       background: rgba(168, 168, 168);
     }

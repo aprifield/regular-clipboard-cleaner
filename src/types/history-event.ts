@@ -18,5 +18,5 @@ export interface HistoryEvent {
 }
 
 export interface PreprocessingHistoryEvent extends HistoryEvent {
-  preventPaste(): void;
+  preventPaste: () => void;
 }

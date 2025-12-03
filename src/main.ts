@@ -1,12 +1,14 @@
-import Vue from 'vue';
-import App from './App.vue';
-import vuetify from './plugins/vuetify';
-import 'roboto-fontface/css/roboto/roboto-fontface.css';
+import { createApp } from 'vue';
+import { createVuetify } from 'vuetify';
+import * as components from 'vuetify/components';
+import * as directives from 'vuetify/directives';
+import App from '@/App.vue';
+import 'vuetify/styles';
 import '@mdi/font/css/materialdesignicons.css';
 
-Vue.config.productionTip = false;
+const vuetify = createVuetify({
+  components,
+  directives,
+});
 
-new Vue({
-  vuetify,
-  render: h => h(App)
-}).$mount('#app');
+createApp(App).use(vuetify).mount('#app');
