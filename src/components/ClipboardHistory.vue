@@ -386,7 +386,7 @@ onUnmounted(() => {
           <v-list-item
             :id="`clipboard-row-${index}`"
             :key="`list-item-${index}`"
-            :class="{ 'v-list-item--active': index === selectedIndex }"
+            :active="index === selectedIndex"
             density="compact"
             @click="onListItemClick(item.text)"
             @mousemove="selectedIndex = index"
@@ -394,24 +394,28 @@ onUnmounted(() => {
             <template #prepend>
               <div class="history-prepend">
                 <template v-if="props.settings.maintained">
-                  <v-btn
-                    :class="{ 'd-block': item.pinned }"
-                    density="compact"
-                    :icon="
-                      item.pinned && index === selectedIndex
-                        ? 'mdi-pin-off-outline'
-                        : 'mdi-pin-outline'
-                    "
-                    size="x-small"
-                    :title="
-                      item.pinned
-                        ? 'Unpin to allow deletion'
-                        : 'Pin to keep from deletion'
-                    "
-                    variant="plain"
-                    @click.stop="onPinClick(item.text)"
-                    @mousedown.stop
-                  />
+                  <v-hover>
+                    <template #default="{ isHovering, props: defaultProps }">
+                      <v-btn
+                        v-bind="defaultProps"
+                        :class="{ 'd-block': item.pinned }"
+                        :color="item.pinned ? 'primary' : undefined"
+                        density="compact"
+                        :icon="
+                          item.pinned && isHovering ? 'mdi-pin-off' : 'mdi-pin'
+                        "
+                        size="x-small"
+                        :title="
+                          item.pinned
+                            ? 'Unpin to allow deletion'
+                            : 'Pin to keep from deletion'
+                        "
+                        variant="plain"
+                        @click.stop="onPinClick(item.text)"
+                        @mousedown.stop.prevent
+                      />
+                    </template>
+                  </v-hover>
                   <div v-if="!item.pinned" class="history-no">
                     {{ item.row }}
                   </div>
@@ -499,6 +503,10 @@ onUnmounted(() => {
           display: block;
         }
       }
+    }
+
+    :deep(.v-list-item__overlay) {
+      transition: none;
     }
   }
 

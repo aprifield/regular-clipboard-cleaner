@@ -56,6 +56,7 @@ watch(
   <!-- To improve performance in v-virtual-scroll, delay tooltip element creation until actually displayed. -->
   <v-tooltip
     v-if="props.tooltip"
+    content-class="tooltip-content elevation-4"
     location="bottom"
     :model-value="isTooltipVisible"
     transition="fade-transition"
@@ -63,7 +64,7 @@ watch(
     <template #activator="{ props: activatorProps }">
       <span v-bind="activatorProps" class="history-text">{{ props.text }}</span>
     </template>
-    <div class="tooltip-content">
+    <div class="tooltip-container">
       <div class="tooltip-caption">
         {{ new Date(time).toLocaleString() }}
         {{ historyEvent.events.map((e) => `[${e.code}]`).join('') }}
@@ -101,27 +102,36 @@ watch(
   <span v-else class="history-text">{{ props.text }}</span>
 </template>
 
+<style lang="scss">
+.tooltip-content {
+  left: 12px !important;
+  color: rgba(
+    var(--v-theme-on-background),
+    var(--v-high-emphasis-opacity)
+  ) !important;
+  background: rgb(var(--v-theme-background)) !important;
+}
+</style>
+
 <style scoped lang="scss">
 .history-text {
-  font-size: 12px;
+  font-size: 10px;
 }
 
-.tooltip-content {
-  max-width: calc(100vw - 24px);
-  min-width: calc(100vw - 24px);
+.tooltip-container {
   max-height: calc(50vh);
   overflow: hidden;
 
   .tooltip-caption {
-    font-size: 12px;
+    font-size: 8px;
   }
 
   .tooltip-text {
     font-family: Consolas, 'Courier New', 'Roboto', sans-serif;
-    font-size: 12px;
+    font-size: 10px;
 
     .tooltip-line {
-      line-height: 18px;
+      line-height: 16px;
       overflow-wrap: break-word;
     }
 
@@ -131,16 +141,16 @@ watch(
     }
 
     .tooltip-icon-return {
-      font-size: 10px;
+      font-size: 8px;
       margin-top: -1px;
       margin-left: 1px;
-      color: rgb(var(--v-theme-on-surface-variant));
+      color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity));
       opacity: 0.8;
     }
 
     .tooltip-icon-dots {
-      font-size: 12px;
-      color: rgb(var(--v-theme-on-surface-variant));
+      font-size: 10px;
+      color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity));
       opacity: 0.8;
     }
   }

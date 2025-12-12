@@ -9,6 +9,22 @@ import '@mdi/font/css/materialdesignicons.css';
 const vuetify = createVuetify({
   components,
   directives,
+  theme: {
+    themes: {
+      light: {
+        dark: false,
+        colors: {
+          primary: '#008080',
+        },
+      },
+      dark: {
+        dark: true,
+        colors: {
+          primary: '#008080',
+        },
+      },
+    },
+  },
 });
 
 createApp(App).use(vuetify).mount('#app');
