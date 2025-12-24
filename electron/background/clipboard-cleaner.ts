@@ -102,7 +102,7 @@ function startMonitoring() {
       if (0 <= index) {
         const foundItem = historyItems[index];
         historyItems.splice(index, 1);
-        historyItems.unshift(foundItem);
+        historyItems.unshift({ ...foundItem, time });
       } else {
         historyItems.unshift({ text, time });
       }
