@@ -24,7 +24,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (
     e: 'click:clipboard-list-item' | 'keydown:clipboard-enter',
-    value: { text: string; historyEvent: HistoryEvent }
+    value: { text: string; historyEvent: HistoryEvent },
   ): void;
   (e: 'click:clipboard-pin' | 'click:clipboard-delete', value: string): void;
   (e: 'keydown:clipboard-escape'): void;
@@ -56,26 +56,34 @@ const tableHistoryItems = computed<TableHistoryItem[]>(() => {
 });
 
 const currentHistoryItems = computed<TableHistoryItem[]>(() => {
-  if (search.value) {
-    if (search.value === '/pin') {
-      return tableHistoryItems.value.filter(
-        (item) => item.pinned || item.text.includes('/pin')
-      );
-    } else {
-      const wordRegExps = search.value
-        .split(' ')
-        .filter(Boolean)
-        .map((word) => word.replace(/[.*+?^=!:${}()|[\]/\\]/g, String.raw`\$&`))
-        .map((word) => new RegExp(word, 'i'));
-      return wordRegExps.length > 0
-        ? tableHistoryItems.value.filter((item) =>
-            wordRegExps.every((re) => re.test(item.text))
-          )
-        : tableHistoryItems.value;
-    }
-  } else {
+  if (!search.value.trim()) {
     return tableHistoryItems.value;
   }
+
+  const searchWords = search.value.split(' ').filter(Boolean);
+
+  const isPinFiltering = searchWords.includes('/pin');
+
+  let filteredHistoryItems = isPinFiltering
+    ? tableHistoryItems.value.filter(
+        (item) => item.pinned || item.text.includes('/pin')
+      )
+    : tableHistoryItems.value;
+
+  const normalSearchWords = searchWords.filter((word) => word !== '/pin');
+
+  if (normalSearchWords.length > 0) {
+    const searchWordRegExps = normalSearchWords.map((word) => {
+      const escaped = word.replace(/[.*+?^=!:${}()|[\]/\\]/g, String.raw`\$&`);
+      return new RegExp(escaped, 'i');
+    });
+
+    filteredHistoryItems = filteredHistoryItems.filter((item) =>
+      searchWordRegExps.every((re) => re.test(item.text))
+    );
+  }
+
+  return filteredHistoryItems;
 });
 
 const tooltipHistoryEvent = computed<HistoryEvent>(() => {
@@ -280,9 +288,8 @@ async function onWindowKeyDown(event: KeyboardEvent) {
       }
     }
     if (currentHistoryItems.value[targetSelectedIndex]) {
-      const targetSelectedRow = await adjustScrollPositionAndFindTargetRow(
-        targetSelectedIndex
-      );
+      const targetSelectedRow =
+        await adjustScrollPositionAndFindTargetRow(targetSelectedIndex);
       selectedIndex.value = targetSelectedRow ? targetSelectedIndex : -1;
     }
   } else {
