@@ -6,7 +6,8 @@ import {
   setHistoryItems,
 } from './electron-store-helper';
 
-let timeoutId: NodeJS.Timeout;
+let clipboardMonitorTimeoutId: NodeJS.Timeout;
+let historyExpirationTimeoutId: NodeJS.Timeout;
 
 function startMonitoring() {
   const historyItems = getHistoryItems();
@@ -16,6 +17,7 @@ function startMonitoring() {
   const clearInterval = rules.clearInterval.value(settings.clearInterval);
   const maxHistoryCount = rules.maxHistoryCount.value(settings.maxHistoryCount);
   const maxTextLength = rules.maxTextLength.value(settings.maxTextLength);
+  const retentionPeriod = rules.retentionPeriod.value(settings.retentionPeriod);
 
   const blockList = (settings.blockList || [])
     .map((str) => str.replace(/[.*+?^=!:${}()|[\]/\\]/g, String.raw`\$&`))
@@ -51,7 +53,7 @@ function startMonitoring() {
     ipcMain.emit('native:change:clipboard-history', historyItems);
   }
 
-  return setInterval(() => {
+  clipboardMonitorTimeoutId = setInterval(() => {
     const time = Date.now();
     const text = clipboard.readText();
     const currentAvailableFormats = clipboard.availableFormats();
@@ -120,11 +122,30 @@ function startMonitoring() {
       }
     }
   }, monitorInterval * 1000);
+
+  historyExpirationTimeoutId = setInterval(() => {
+    const expirationTime = Date.now() - retentionPeriod * 60 * 1000;
+    let isChanged = false;
+
+    for (let i = historyItems.length - 1; i >= 0; i--) {
+      const item = historyItems[i];
+      if (!item.pinned && item.time < expirationTime) {
+        historyItems.splice(i, 1);
+        isChanged = true;
+      }
+    }
+
+    if (isChanged) {
+      setHistoryItems(historyItems);
+      ipcMain.emit('native:change:clipboard-history', historyItems);
+    }
+  }, 60 * 1000);
 }
 
 export function restartMonitoring() {
-  clearInterval(timeoutId);
-  timeoutId = startMonitoring();
+  clearInterval(clipboardMonitorTimeoutId);
+  clearInterval(historyExpirationTimeoutId);
+  startMonitoring();
 }
 
 export function pinHistory(pinnedText: string) {
@@ -162,4 +183,4 @@ export function deleteAllHistory() {
   restartMonitoring();
 }
 
-timeoutId = startMonitoring();
+startMonitoring();

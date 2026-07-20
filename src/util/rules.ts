@@ -3,78 +3,70 @@ const rules = {
     init: 1,
     min: 1,
     max: Math.floor((Math.pow(2, 32) / 2 - 1) / 1000),
-    rule: (value: string | number | undefined): boolean => {
-      const obj = rules.monitorInterval;
-      return obj.min <= Number(value) && Number(value) <= obj.max;
-    },
     value: (value: string | number | undefined): number => {
       const obj = rules.monitorInterval;
-      return obj.rule(value) ? Number(value) : obj.init;
+      const num = Number(value);
+      return obj.min <= num && num <= obj.max ? num : obj.init;
     },
   },
   clearInterval: {
     init: 60,
     min: 1,
     max: Math.floor((Math.pow(2, 32) / 2 - 1) / 1000),
-    rule: (value: string | number | undefined): boolean => {
-      const obj = rules.clearInterval;
-      return obj.min <= Number(value) && Number(value) <= obj.max;
-    },
     value: (value: string | number | undefined): number => {
       const obj = rules.clearInterval;
-      return obj.rule(value) ? Number(value) : obj.init;
+      const num = Number(value);
+      return obj.min <= num && num <= obj.max ? num : obj.init;
     },
   },
   maxHistoryCount: {
     init: 100,
     min: 0,
     max: Number.MAX_SAFE_INTEGER,
-    rule: (value: string | number | undefined): boolean => {
-      const obj = rules.maxHistoryCount;
-      return obj.min <= Number(value) && Number(value) <= obj.max;
-    },
     value: (value: string | number | undefined): number => {
       const obj = rules.maxHistoryCount;
-      return obj.rule(value) ? Number(value) : obj.init;
+      const num = Number(value);
+      return obj.min <= num && num <= obj.max ? num : obj.init;
     },
   },
   maxTextLength: {
     init: 100_000,
     min: 1,
     max: Number.MAX_SAFE_INTEGER,
-    rule: (value: string | number | undefined): boolean => {
-      const obj = rules.maxTextLength;
-      return obj.min <= Number(value) && Number(value) <= obj.max;
-    },
     value: (value: string | number | undefined): number => {
       const obj = rules.maxTextLength;
-      return obj.rule(value) ? Number(value) : obj.init;
+      const num = Number(value);
+      return obj.min <= num && num <= obj.max ? num : obj.init;
+    },
+  },
+  retentionPeriod: {
+    init: 60 * 24 * 7,
+    min: 1,
+    max: Number.MAX_SAFE_INTEGER,
+    value: (value: string | number | undefined): number => {
+      const obj = rules.retentionPeriod;
+      const num = Number(value);
+      return obj.min <= num && num <= obj.max ? num : obj.init;
     },
   },
   pasteAfterCopyTimeout: {
     init: 300,
     min: 0,
-    max: Math.pow(2, 32) / 2 - 1,
-    rule: (value: string | number | undefined): boolean => {
-      const obj = rules.pasteAfterCopyTimeout;
-      return obj.min <= Number(value) && Number(value) <= obj.max;
-    },
+    max: Number.MAX_SAFE_INTEGER,
     value: (value: string | number | undefined): number => {
       const obj = rules.pasteAfterCopyTimeout;
-      return obj.rule(value) ? Number(value) : obj.init;
+      const num = Number(value);
+      return obj.min <= num && num <= obj.max ? num : obj.init;
     },
   },
   commandAfterCopyTimeout: {
     init: 300,
     min: 0,
-    max: Math.pow(2, 32) / 2 - 1,
-    rule: (value: string | number | undefined): boolean => {
-      const obj = rules.commandAfterCopyTimeout;
-      return obj.min <= Number(value) && Number(value) <= obj.max;
-    },
+    max: Number.MAX_SAFE_INTEGER,
     value: (value: string | number | undefined): number => {
       const obj = rules.commandAfterCopyTimeout;
-      return obj.rule(value) ? Number(value) : obj.init;
+      const num = Number(value);
+      return obj.min <= num && num <= obj.max ? num : obj.init;
     },
   },
 };

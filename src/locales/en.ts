@@ -27,16 +27,17 @@ export default {
   'tray.deleteAllHistory': 'Delete All History',
   'tray.settings': 'Settings',
   'tray.exit': 'Exit',
-  'settings.seconds': 'Seconds',
   'settings.milliseconds': 'Milliseconds',
+  'settings.seconds': 'Seconds',
+  'settings.minutes': 'Minutes',
   'settings.startAtLogin': 'Start the application at login',
   'settings.maintained':
     'Maintain the clipboard history even after restarting the application',
   'settings.clearInterval': 'Interval to clear the clipboard',
   'settings.monitorInterval': 'Interval to monitor the clipboard',
-  'settings.maxHistoryCount': 'Number of clipboard histories to be saved',
-  'settings.maxTextLength':
-    'Maximum length of text to be saved in the clipboard history',
+  'settings.maxHistoryCount': 'Maximum number of the clipboard history',
+  'settings.maxTextLength': 'Maximum text length of the clipboard history',
+  'settings.retentionPeriod': 'Retention period of the clipboard history',
   'settings.shortcutComment':
     'Shortcut for displaying the clipboard history window',
   'settings.preprocessing': 'Set text processing before copying',

@@ -72,7 +72,8 @@ function onClipboardSettingsChange(setting: Settings) {
       <div class="pa-4">
         <v-row>
           <v-col cols="12" sm="6">
-            <v-text-field
+            <v-number-input
+              control-variant="stacked"
               density="compact"
               hide-details
               :label="__('settings.clearInterval')"
@@ -81,17 +82,17 @@ function onClipboardSettingsChange(setting: Settings) {
               :model-value="
                 rules.clearInterval.value(props.settings.clearInterval)
               "
-              :rules="[rules.clearInterval.rule]"
               :suffix="__('settings.seconds')"
               type="number"
               variant="outlined"
               @update:model-value="
-                onClipboardSettingsChange({ clearInterval: +$event })
+                onClipboardSettingsChange({ clearInterval: $event })
               "
             />
           </v-col>
           <v-col cols="12" sm="6">
-            <v-text-field
+            <v-number-input
+              control-variant="stacked"
               density="compact"
               hide-details
               :label="__('settings.monitorInterval')"
@@ -100,19 +101,19 @@ function onClipboardSettingsChange(setting: Settings) {
               :model-value="
                 rules.monitorInterval.value(props.settings.monitorInterval)
               "
-              :rules="[rules.monitorInterval.rule]"
               :suffix="__('settings.seconds')"
               type="number"
               variant="outlined"
               @update:model-value="
-                onClipboardSettingsChange({ monitorInterval: +$event })
+                onClipboardSettingsChange({ monitorInterval: $event })
               "
             />
           </v-col>
         </v-row>
         <v-row>
           <v-col cols="12" sm="6">
-            <v-text-field
+            <v-number-input
+              control-variant="stacked"
               density="compact"
               hide-details
               :label="__('settings.maxHistoryCount')"
@@ -121,16 +122,16 @@ function onClipboardSettingsChange(setting: Settings) {
               :model-value="
                 rules.maxHistoryCount.value(props.settings.maxHistoryCount)
               "
-              :rules="[rules.maxHistoryCount.rule]"
               type="number"
               variant="outlined"
               @update:model-value="
-                onClipboardSettingsChange({ maxHistoryCount: +$event })
+                onClipboardSettingsChange({ maxHistoryCount: $event })
               "
             />
           </v-col>
           <v-col cols="12" sm="6">
-            <v-text-field
+            <v-number-input
+              control-variant="stacked"
               density="compact"
               hide-details
               :label="__('settings.maxTextLength')"
@@ -139,11 +140,32 @@ function onClipboardSettingsChange(setting: Settings) {
               :model-value="
                 rules.maxTextLength.value(props.settings.maxTextLength)
               "
-              :rules="[rules.maxTextLength.rule]"
               type="number"
               variant="outlined"
               @update:model-value="
-                onClipboardSettingsChange({ maxTextLength: +$event })
+                onClipboardSettingsChange({ maxTextLength: $event })
+              "
+            />
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="12" sm="6">
+            <v-number-input
+              control-variant="stacked"
+              density="compact"
+              hide-details
+              :label="__('settings.retentionPeriod')"
+              :max="rules.retentionPeriod.max"
+              :min="rules.retentionPeriod.min"
+              :model-value="
+                rules.retentionPeriod.value(props.settings.retentionPeriod)
+              "
+              :step="30"
+              :suffix="__('settings.minutes')"
+              type="number"
+              variant="outlined"
+              @update:model-value="
+                onClipboardSettingsChange({ retentionPeriod: $event })
               "
             />
           </v-col>
@@ -268,7 +290,8 @@ function onClipboardSettingsChange(setting: Settings) {
             </span>
           </v-col>
           <v-col cols="12" sm="6">
-            <v-text-field
+            <v-number-input
+              control-variant="stacked"
               density="compact"
               hide-details
               :label="__('settings.pasteAfterCopyTimeout')"
@@ -279,12 +302,11 @@ function onClipboardSettingsChange(setting: Settings) {
                   props.settings.pasteAfterCopyTimeout
                 )
               "
-              :rules="[rules.pasteAfterCopyTimeout.rule]"
               :suffix="__('settings.milliseconds')"
               type="number"
               variant="outlined"
               @update:model-value="
-                onClipboardSettingsChange({ pasteAfterCopyTimeout: +$event })
+                onClipboardSettingsChange({ pasteAfterCopyTimeout: $event })
               "
             />
           </v-col>
@@ -303,7 +325,8 @@ function onClipboardSettingsChange(setting: Settings) {
             />
           </v-col>
           <v-col cols="12" sm="6">
-            <v-text-field
+            <v-number-input
+              control-variant="stacked"
               density="compact"
               hide-details
               :label="__('settings.commandAfterCopyTimeout')"
@@ -314,13 +337,12 @@ function onClipboardSettingsChange(setting: Settings) {
                   props.settings.commandAfterCopyTimeout
                 )
               "
-              :rules="[rules.commandAfterCopyTimeout.rule]"
               :suffix="__('settings.milliseconds')"
               type="number"
               variant="outlined"
               @update:model-value="
                 onClipboardSettingsChange({
-                  commandAfterCopyTimeout: +$event,
+                  commandAfterCopyTimeout: $event
                 })
               "
             />
