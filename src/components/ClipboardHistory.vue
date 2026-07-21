@@ -356,20 +356,19 @@ onUnmounted(() => {
 
 <template>
   <v-sheet>
-    <div class="px-2">
+    <div>
       <v-text-field
         ref="textField"
-        density="comfortable"
+        density="compact"
         hide-details
         :model-value="search"
         :placeholder="`Search${props.settings.maintained ? ' (/pin)' : ''}`"
-        variant="underlined"
         @blur="isTextFieldFocused = false"
         @focus="isTextFieldFocused = true"
         @update:model-value="onSearchInput"
       >
         <template #prepend-inner>
-          <v-icon class="mt-1" size="20">mdi-magnify</v-icon>
+          <v-icon size="18">mdi-magnify</v-icon>
         </template>
       </v-text-field>
     </div>
@@ -424,11 +423,13 @@ onUnmounted(() => {
                     </template>
                   </v-hover>
                   <div v-if="!item.pinned" class="history-no">
-                    {{ item.row }}
+                    <v-chip label size="x-small">{{ item.row }}</v-chip>
                   </div>
                 </template>
                 <template v-else>
-                  <div class="history-no d-block">{{ item.row }}</div>
+                  <div class="history-no">
+                    <v-chip label size="x-small">{{ item.row }}</v-chip>
+                  </div>
                 </template>
               </div>
             </template>
@@ -474,17 +475,18 @@ onUnmounted(() => {
     min-height: 32px;
 
     .history-prepend {
+      min-width: 28px;
       margin-right: 8px;
-      min-width: 22px;
+      margin-left: -8px;
 
       .history-no {
-        text-align: right;
-        font-size: 12px;
         opacity: 0.6;
+        text-align: right;
       }
 
       .v-btn {
         display: none;
+        margin: auto;
       }
     }
 
