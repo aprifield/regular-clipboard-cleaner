@@ -427,7 +427,7 @@ onUnmounted(() => {
                   </div>
                 </template>
                 <template v-else>
-                  <div class="history-no">
+                  <div class="history-no d-block">
                     <v-chip label size="x-small">{{ item.row }}</v-chip>
                   </div>
                 </template>
