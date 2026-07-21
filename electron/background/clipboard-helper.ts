@@ -2,14 +2,11 @@ import type {
   HistoryEvent,
   PreprocessingHistoryEvent,
 } from '@/types/history-event';
-import { exec, execFile } from 'node:child_process';
-import path from 'node:path';
+import { exec } from 'node:child_process';
 import { clipboard, dialog } from 'electron';
 import defaultPreprocessing from '@/util/preprocessing';
 import rules from '@/util/rules';
 import { getSettings } from './electron-store-helper';
-
-const isDevelopment = process.env.NODE_ENV === 'development';
 
 export function copyTextAndPostProcess(
   text: string,
@@ -38,19 +35,15 @@ export function copyTextAndPostProcess(
   if (!isPastePrevent) {
     if (settings.pasteAfterCopy) {
       setTimeout(() => {
-        const keySenderFilePath = isDevelopment
-          ? path.join(
-              process.env.APP_ROOT,
-              'resources',
-              'bin',
-              'DotNetKeySender.exe'
-            )
-          : path.join(process.resourcesPath, 'bin', 'DotNetKeySender.exe');
-        execFile(keySenderFilePath, ['^v'], (error) => {
+        const command =
+          process.platform === 'darwin'
+            ? `osascript -e 'tell application "System Events" to keystroke "v" using command down'`
+            : `powershell -NoProfile -WindowStyle Hidden -Command "Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.SendKeys]::SendWait('^{v}')"`;
+        exec(command, (error) => {
           if (error) {
             dialog.showErrorBox(
               'Paste Error',
-              `The command [${error.cmd}] failed.`
+              `The command [${command}] failed.`
             );
           }
         });

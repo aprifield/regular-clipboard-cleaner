@@ -277,7 +277,6 @@ function onClipboardSettingsChange(setting: Settings) {
           <v-col cols="12" sm="6">
             <v-checkbox
               density="compact"
-              :disabled="platform === 'darwin'"
               hide-details
               :label="__('settings.pasteAfterCopy')"
               :model-value="props.settings.pasteAfterCopy"

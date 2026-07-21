@@ -45,7 +45,7 @@ export default {
   'settings.pasteAfterCopy': 'Paste after copying',
   'settings.pasteAfterCopyTimeout': 'Wait time before pasting',
   'settings.pasteAfterCopyComment':
-    'Cannot be enabled on Mac as it will crash the application',
+    'Cannot paste on Mac as focus cannot be maintained',
   'settings.commandAfterCopy': 'Command after copying',
   'settings.commandAfterCopyTimeout': 'Wait time before executing the command',
   'settings.showNearCursor':

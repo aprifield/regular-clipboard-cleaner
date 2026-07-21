@@ -44,7 +44,7 @@ export default {
   'settings.pasteAfterCopyTimeout':
     'コピー後に貼り付けを実行するまでの待機時間',
   'settings.pasteAfterCopyComment':
-    'アプリが落ちるため Mac では有効にできません',
+    'フォーカスを維持できないため Mac では貼り付けできません',
   'settings.commandAfterCopy': 'コピー後に実行するコマンド',
   'settings.commandAfterCopyTimeout':
     'コピー後にコマンドを実行するまでの待機時間',
