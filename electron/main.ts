@@ -122,9 +122,10 @@ async function showOrCreateWindow(mode: 'history' | 'settings') {
     };
 
     if (mode === 'history' && settings.showNearCursor) {
+      const offset = 8; // Add an offset to prevent the cursor from overlapping the history window
       const point = screen.getCursorScreenPoint();
-      bounds.x = point.x;
-      bounds.y = point.y;
+      bounds.x = point.x + offset;
+      bounds.y = point.y + offset;
     }
 
     const display = screen.getDisplayNearestPoint(bounds);
