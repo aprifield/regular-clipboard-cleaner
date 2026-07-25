@@ -22,8 +22,6 @@ export interface Settings {
   commandAfterCopyTimeout?: number;
   showNearCursor?: boolean;
   showFrame?: boolean;
-  showTaskbarIcon?: boolean;
-  showDockIcon?: boolean;
   darkTheme?: boolean;
   blockList?: string[];
   historyBounds?: Rectangle;

@@ -284,9 +284,6 @@ function onClipboardSettingsChange(setting: Settings) {
                 onClipboardSettingsChange({ pasteAfterCopy: !!$event })
               "
             />
-            <span v-if="platform === 'darwin'" class="text-caption">
-              ({{ __('settings.pasteAfterCopyComment') }})
-            </span>
           </v-col>
           <v-col cols="12" sm="6">
             <v-number-input
@@ -372,30 +369,6 @@ function onClipboardSettingsChange(setting: Settings) {
               :model-value="props.settings.showFrame"
               @update:model-value="
                 onClipboardSettingsChange({ showFrame: !!$event })
-              "
-            />
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col>
-            <v-checkbox
-              v-if="platform === 'darwin'"
-              density="compact"
-              hide-details
-              :label="__('settings.showDockIcon')"
-              :model-value="props.settings.showDockIcon"
-              @update:model-value="
-                onClipboardSettingsChange({ showDockIcon: !!$event })
-              "
-            />
-            <v-checkbox
-              v-else
-              density="compact"
-              hide-details
-              :label="__('settings.showTaskbarIcon')"
-              :model-value="props.settings.showTaskbarIcon"
-              @update:model-value="
-                onClipboardSettingsChange({ showTaskbarIcon: !!$event })
               "
             />
           </v-col>

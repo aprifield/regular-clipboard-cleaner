@@ -44,16 +44,12 @@ export default {
   'settings.closeAfterCopy': 'Close the clipboard history window after copying',
   'settings.pasteAfterCopy': 'Paste after copying',
   'settings.pasteAfterCopyTimeout': 'Wait time before pasting',
-  'settings.pasteAfterCopyComment':
-    'Cannot paste on Mac as focus cannot be maintained',
   'settings.commandAfterCopy': 'Command after copying',
   'settings.commandAfterCopyTimeout': 'Wait time before executing the command',
   'settings.showNearCursor':
     'Show the clipboard history window near the mouse cursor',
   'settings.showFrame':
     'Show frame and menu bar on the clipboard history window',
-  'settings.showDockIcon': 'Show the icon in the Dock',
-  'settings.showTaskbarIcon': 'Show the icon in the taskbar',
   'settings.darkTheme': 'Dark theme',
   'settings.blockList': 'Set words not to be saved in the clipboard history',
 };

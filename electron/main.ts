@@ -3,9 +3,7 @@ import type { Settings } from '@/types/settings';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { app, BrowserWindow, ipcMain, nativeTheme, screen } from 'electron';
-import { showDockIcon, switchDockIcon } from './background/app-dock-helper';
 import { setOpenAtLogin } from './background/app-login-helper';
-import { switchTaskbarIcon } from './background/app-taskbar-helper';
 import {
   deleteAllHistory,
   deleteHistory,
@@ -59,7 +57,7 @@ function createWindow(mode: 'history' | 'settings') {
     frame: mode === 'settings' || settings.showFrame,
     maximizable: false,
     show: false,
-    skipTaskbar: mode === 'history' && !settings.showTaskbarIcon,
+    skipTaskbar: mode === 'history',
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -69,7 +67,9 @@ function createWindow(mode: 'history' | 'settings') {
   });
   if (mode === 'settings') {
     settingsWin = win;
-    showDockIcon();
+    if (process.platform === 'darwin') {
+      app.dock.show();
+    }
   } else {
     historyWin = win;
   }
@@ -95,7 +95,9 @@ function createWindow(mode: 'history' | 'settings') {
   win.on('closed', () => {
     if (mode === 'settings') {
       settingsWin = null;
-      switchDockIcon();
+      if (process.platform === 'darwin') {
+        app.dock.hide();
+      }
     } else {
       historyWin = null;
     }
@@ -169,18 +171,10 @@ async function hideWindow(win: BrowserWindow | null) {
   }
 
   if (process.platform === 'darwin') {
-    const settings = getSettings();
-    if (settings.showDockIcon) {
-      // Don't use setOpacity on mac because the minimized image is not displayed.
-      win.minimize();
-    } else {
-      // Don't use hide on windows because the paste target will not be active.
-      // The paste doesn't work on mac, so no problem.
-      win.hide();
-    }
+    app.hide(); // Use app.hide() on mac because the paste target will not be active.
   } else {
     win.setOpacity(0); // Disable minimization animation
-    win.minimize();
+    win.minimize(); // Don't use win.hide() on windows because the paste target will not be active.
     setTimeout(() => {
       win.setOpacity(1);
     });
@@ -270,7 +264,6 @@ ipcMain
     restartMonitoring();
     registerShortcut();
     setOpenAtLogin();
-    switchTaskbarIcon(historyWin);
     sendToWebContents();
   })
   .on('native:click:menu-settings', () => {

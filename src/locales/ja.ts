@@ -43,8 +43,6 @@ export default {
   'settings.pasteAfterCopy': 'コピー後に貼り付けを実行する',
   'settings.pasteAfterCopyTimeout':
     'コピー後に貼り付けを実行するまでの待機時間',
-  'settings.pasteAfterCopyComment':
-    'フォーカスを維持できないため Mac では貼り付けできません',
   'settings.commandAfterCopy': 'コピー後に実行するコマンド',
   'settings.commandAfterCopyTimeout':
     'コピー後にコマンドを実行するまでの待機時間',
@@ -52,8 +50,6 @@ export default {
     'マウスカーソルの近くにクリップボード履歴画面を表示する',
   'settings.showFrame':
     'クリップボード履歴画面にフレームやメニューバーを表示する',
-  'settings.showDockIcon': 'Dock にアイコンを表示する',
-  'settings.showTaskbarIcon': 'タスクバーにアイコンを表示する',
   'settings.darkTheme': 'ダークテーマ',
   'settings.blockList': 'クリップボード履歴に保存しない単語を設定する',
 };
