@@ -113,7 +113,14 @@ onMounted(() => {
   user-select: none;
 }
 
+:root {
+  --font-default: system-ui, sans-serif;
+  --font-monospace:
+    Consolas, 'Courier New', 'SF Mono', Menlo, Monaco, monospace;
+}
+
 html {
+  font-family: var(--font-default);
   overflow: auto;
 }
 

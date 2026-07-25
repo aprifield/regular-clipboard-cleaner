@@ -127,7 +127,7 @@ watch(
   }
 
   .tooltip-text {
-    font-family: Consolas, 'Courier New', 'Roboto', sans-serif;
+    font-family: var(--font-monospace);
     font-size: 10px;
 
     .tooltip-line {

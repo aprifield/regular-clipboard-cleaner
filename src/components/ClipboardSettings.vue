@@ -468,7 +468,7 @@ function onClipboardSettingsChange(setting: Settings) {
 <style scoped lang="scss">
 .v-textarea {
   :deep(textarea) {
-    font-family: Consolas, monospace;
+    font-family: var(--font-monospace);
   }
 }
 </style>
