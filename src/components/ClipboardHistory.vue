@@ -356,7 +356,7 @@ onUnmounted(() => {
 
 <template>
   <v-sheet>
-    <div>
+    <div ref="textContainer">
       <v-text-field
         ref="textField"
         density="compact"
@@ -481,7 +481,7 @@ onUnmounted(() => {
 
       .history-no {
         opacity: 0.6;
-        text-align: right;
+        text-align: center;
       }
 
       .v-btn {

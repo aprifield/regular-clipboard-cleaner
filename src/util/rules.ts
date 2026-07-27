@@ -59,16 +59,6 @@ const rules = {
       return obj.min <= num && num <= obj.max ? num : obj.init;
     },
   },
-  commandAfterCopyTimeout: {
-    init: 300,
-    min: 0,
-    max: Number.MAX_SAFE_INTEGER,
-    value: (value: string | number | undefined): number => {
-      const obj = rules.commandAfterCopyTimeout;
-      const num = Number(value);
-      return obj.min <= num && num <= obj.max ? num : obj.init;
-    },
-  },
 };
 
 export default rules;

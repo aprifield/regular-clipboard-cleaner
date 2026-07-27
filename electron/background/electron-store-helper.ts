@@ -17,8 +17,7 @@ const settingsStore = new Store<{ settings: Settings }>({
   defaults: {
     settings: {
       startAtLogin: true,
-      pasteAfterCopy: process.platform !== 'darwin',
-      closeAfterCopy: true,
+      pasteAfterCopy: true,
       showNearCursor: true,
     },
   },

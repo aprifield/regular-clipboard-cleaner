@@ -37,19 +37,15 @@ export default {
   'settings.maxHistoryCount': 'クリップボード履歴の保存件数',
   'settings.maxTextLength': 'クリップボード履歴の最大文字数',
   'settings.retentionPeriod': 'クリップボード履歴の保持期間',
+  'settings.retentionPeriodHint': '{0} 日（{1} 時間）',
+  'settings.retentionPeriodHintAbout': '約 {0} 日（{1} 時間）',
   'settings.shortcutComment': 'クリップボード履歴画面を表示するショートカット',
   'settings.preprocessing': 'コピー前のテキスト編集処理を設定する',
   'settings.closeAfterCopy': 'コピー後にクリップボード履歴画面を閉じる',
   'settings.pasteAfterCopy': 'コピー後に貼り付けを実行する',
-  'settings.pasteAfterCopyTimeout':
-    'コピー後に貼り付けを実行するまでの待機時間',
-  'settings.commandAfterCopy': 'コピー後に実行するコマンド',
-  'settings.commandAfterCopyTimeout':
-    'コピー後にコマンドを実行するまでの待機時間',
-  'settings.showNearCursor':
-    'マウスカーソルの近くにクリップボード履歴画面を表示する',
-  'settings.showFrame':
-    'クリップボード履歴画面にフレームやメニューバーを表示する',
+  'settings.pasteAfterCopyTimeout': 'コピー後に貼り付けを実行するまでの待機時間',
+  'settings.showNearCursor': 'マウスカーソルの近くにクリップボード履歴画面を表示する',
+  'settings.showFrame': 'クリップボード履歴画面にフレームやメニューバーを表示する',
   'settings.darkTheme': 'ダークテーマ',
   'settings.blockList': 'クリップボード履歴に保存しない単語を設定する',
 };

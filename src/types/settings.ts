@@ -15,11 +15,8 @@ export interface Settings {
     key?: string;
   };
   preprocessing?: string;
-  closeAfterCopy?: boolean;
   pasteAfterCopy?: boolean;
   pasteAfterCopyTimeout?: number;
-  commandAfterCopy?: string;
-  commandAfterCopyTimeout?: number;
   showNearCursor?: boolean;
   showFrame?: boolean;
   darkTheme?: boolean;
