@@ -12,6 +12,9 @@
     target: ['dmg'],
     artifactName: '${productName}-Mac-${version}-Installer.${ext}',
     icon: 'public/icon-512x512.png',
+    extendInfo: {
+      LSUIElement: true, // Dockアイコンを非表示
+    },
   },
   win: {
     target: [
